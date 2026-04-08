@@ -495,7 +495,92 @@
     text-transform: uppercase;
     opacity: 0.7;
     margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
   }
+  .res-tab-badge {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    opacity: 1;
+    background: var(--sage);
+    color: white;
+    white-space: nowrap;
+  }
+  .res-tab-badge.brf  { background: #5a8db5; }
+  .res-tab-badge.hus  { background: #b5855a; }
+  .res-tab-badge.fritidshus { background: var(--sage); }
+
+  /* ── Dynamiska lån ─────────────────────────────────────── */
+  .loans-list { display: flex; flex-direction: column; gap: 12px; }
+  .loan-row {
+    background: white;
+    border: 1.5px solid #ddd8cc;
+    border-radius: 10px;
+    padding: 14px 14px 10px;
+  }
+  .loan-row-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .loan-desc-input {
+    flex: 1;
+    border: none;
+    border-bottom: 1.5px solid #ddd8cc;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--forest);
+    padding: 2px 0 4px;
+    outline: none;
+    transition: border-color 0.15s;
+    min-width: 0;
+  }
+  .loan-desc-input:focus { border-bottom-color: var(--sage); }
+  .loan-remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #bbb;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+    flex-shrink: 0;
+  }
+  .loan-remove-btn:hover { color: var(--red); background: #fdecea; }
+  .loan-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 7px 14px;
+    border: 1.5px dashed #c0d4b0;
+    border-radius: 8px;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--sage);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .loan-add-btn:hover { background: #f0f7ec; border-color: var(--sage); }
+  .loan-total-row {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--grey);
+    font-family: 'DM Mono', monospace;
+  }
+  .loan-total-row strong { color: var(--forest); }
   .result-box .res-verdict {
     font-family: 'Playfair Display', serif;
     font-size: 20px;
@@ -765,14 +850,52 @@
     display: block;
     margin-bottom: 2px;
   }
+
+  /* ── Flikar ─────────────────────────────────────────── */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    margin: 32px 0 0;
+    border-bottom: 2px solid var(--mist);
+    padding-bottom: 0;
+  }
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--grey);
+    cursor: pointer;
+    border-radius: 10px 10px 0 0;
+    border: 1.5px solid transparent;
+    border-bottom: none;
+    margin-bottom: -2px;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .tab-btn:hover { color: var(--forest); background: #f5f2ec; }
+  .tab-btn.active {
+    color: var(--forest);
+    background: white;
+    border-color: var(--mist);
+    font-weight: 600;
+  }
+  .tab-btn .tab-icon { font-size: 18px; line-height: 1; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="subtitle">Ekonomikalkyl · Fritidshus</div>
-  <h1>Vad har ni råd med<br>för <span>fritidshus?</span></h1>
-  <p class="intro">Fyll i er ekonomiska situation och justera parametrarna för att se vad ni kan köpa — med scenarier för trygghet, försiktighet och maximal exponering.</p>
+  <div class="subtitle">Ekonomikalkyl · Boende &amp; Fritidshus</div>
+  <h1>Vad har ni råd med<br>att <span>köpa?</span></h1>
+  <p class="intro">Fyll i er ekonomiska situation och välj sedan BRF, Hus eller Fritidshus — kalkylen visar vad ni kan köpa med scenarier för trygghet, försiktighet och maximal exponering.</p>
 </header>
 
 <div class="main">
@@ -891,25 +1014,16 @@
 
     <div class="settings-group">
       <div class="settings-group-label">Befintliga lån &amp; boende</div>
-      <div class="input-grid">
-        <div class="input-item">
-          <label>Befintligt bolån (kr)</label>
-          <input type="number" id="in-brf-lan" value="0" step="50000" oninput="update()">
-          <span class="input-hint">0 om inget lån</span>
-        </div>
-        <div class="input-item">
-          <label>Ränta befintligt lån (%)</label>
-          <input type="number" id="in-brf-ranta" value="3.0" step="0.1" oninput="update()">
-        </div>
+      <div id="loans-list" class="loans-list"></div>
+      <button class="loan-add-btn" onclick="addLoan()">＋ Lägg till lån</button>
+      <div class="loan-total-row" id="loan-total-row" style="display:none">
+        Totalt per mån: <strong id="loan-total-text">—</strong>
+      </div>
+      <div class="input-grid" style="margin-top:14px">
         <div class="input-item">
           <label>Månadsavgift / hyra (kr)</label>
           <input type="number" id="in-brf-avgift" value="0" step="100" oninput="update()">
-          <span class="input-hint">BRF-avgift eller hyra</span>
-        </div>
-        <div class="input-item">
-          <label>Amortering befintligt lån (kr/mån)</label>
-          <input type="number" id="in-brf-amor" value="0" step="500" oninput="update()">
-          <span class="input-hint">0 om amorteringsfritt</span>
+          <span class="input-hint">BRF-avgift, hyra eller 0</span>
         </div>
       </div>
     </div>
@@ -983,6 +1097,151 @@
 
   </div>
 
+  <!-- FLIKRAD -->
+  <div class="tab-bar">
+    <button class="tab-btn" data-tab="brf" onclick="switchTab('brf')">
+      <span class="tab-icon">🏢</span> BRF
+    </button>
+    <button class="tab-btn" data-tab="hus" onclick="switchTab('hus')">
+      <span class="tab-icon">🏡</span> Hus
+    </button>
+    <button class="tab-btn active" data-tab="fritidshus" onclick="switchTab('fritidshus')">
+      <span class="tab-icon">🌲</span> Fritidshus
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ BRF-PANEL -->
+  <div id="tab-brf" class="tab-panel">
+    <div class="divider"></div>
+    <div class="section-label">Välj BRF-parametrar</div>
+    <div class="slider-section">
+      <h2>Justera parametrar för BRF</h2>
+      <div class="slider-group">
+        <div class="slider-item">
+          <label>Köpeskilling <span id="brf-lbl-pris">3 000 000 kr</span></label>
+          <input type="range" id="brf-sl-pris" min="500000" max="12000000" step="100000" value="3000000">
+        </div>
+        <div class="slider-item">
+          <label>Kontantinsats (% av pris) <span id="brf-lbl-ki">15%</span></label>
+          <input type="range" id="brf-sl-ki" min="10" max="100" step="5" value="15">
+        </div>
+        <div class="slider-item">
+          <label>Ränta <span id="brf-lbl-ranta">4,5%</span></label>
+          <input type="range" id="brf-sl-ranta" min="3.0" max="8.0" step="0.25" value="4.5">
+        </div>
+        <div class="slider-item">
+          <label>Amortering (% av lån/år) <span id="brf-lbl-amor">2%</span></label>
+          <input type="range" id="brf-sl-amor" min="1" max="5" step="0.5" value="2">
+        </div>
+        <div class="slider-item">
+          <label>Månadsavgift <span id="brf-lbl-avgift">4 000 kr/mån</span></label>
+          <input type="range" id="brf-sl-avgift" min="0" max="15000" step="500" value="4000">
+        </div>
+      </div>
+      <div style="margin-top:24px;padding-top:24px;border-top:1px solid #ddd8cc">
+        <div id="brf-spar-info" class="note-box"><span id="brf-spar-text"></span></div>
+      </div>
+    </div>
+
+    <div class="section-label">Scenarioanalys</div>
+    <div class="card" style="margin-bottom:24px; overflow-x:auto;">
+      <table class="sum-table">
+        <thead><tr>
+          <th>Scenario</th><th>Inkomst/mån netto</th><th>Total kostnad/mån</th><th>Kvar/mån</th><th>Klarar det?</th>
+        </tr></thead>
+        <tbody id="brf-scenario-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label">Rekommendation</div>
+    <div class="card dark" style="margin-bottom:24px">
+      <h3 id="brf-rek-rubrik">Beräknar...</h3>
+      <div class="stat-row"><span class="label">Trygg nedre gräns</span><span class="value pos" id="brf-rek-trygg">—</span></div>
+      <div class="stat-row"><span class="label">Balanserat (med buffert)</span><span class="value amber" id="brf-rek-balans">—</span></div>
+      <div class="stat-row"><span class="label">Kräver bästa scenario</span><span class="value neg" id="brf-rek-max">—</span></div>
+      <div class="stat-row"><span class="label">Rekommenderad kontantinsats</span><span class="value" id="brf-rek-ki">—</span></div>
+      <div class="stat-row"><span class="label">Behåll som buffert (minst)</span><span class="value pos" id="brf-rek-buffert">—</span></div>
+      <div class="note-box" style="background:rgba(200,217,184,0.1);border-color:var(--fern);color:var(--mist);margin-top:16px" id="brf-rek-note"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <h3>Ränteavdraget — hur mycket får ni tillbaka?</h3>
+      <p style="font-size:13px;color:var(--grey);margin-bottom:16px;line-height:1.6">30% avdrag upp till 100 000 kr/år, sedan 21% på resterande.</p>
+      <div class="stat-row"><span class="label">Befintligt lån — räntekostnad/år</span><span class="value mono" id="brf-rad-bef-kostnad">—</span></div>
+      <div class="stat-row"><span class="label">BRF-räntekostnad/år</span><span class="value mono" id="brf-rad-ny-kostnad">—</span></div>
+      <div class="stat-row"><span class="label">Avdrag totalt</span><span class="value pos" id="brf-rad-avdrag">—</span></div>
+      <div class="stat-row"><span class="label">Effektiv ränta BRF efter avdrag</span><span class="value pos" id="brf-rad-effektiv">—</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ HUS-PANEL -->
+  <div id="tab-hus" class="tab-panel">
+    <div class="divider"></div>
+    <div class="section-label">Välj husparametrar</div>
+    <div class="slider-section">
+      <h2>Justera parametrar för hus</h2>
+      <div class="slider-group">
+        <div class="slider-item">
+          <label>Köpeskilling <span id="hus-lbl-pris">4 000 000 kr</span></label>
+          <input type="range" id="hus-sl-pris" min="500000" max="15000000" step="100000" value="4000000">
+        </div>
+        <div class="slider-item">
+          <label>Kontantinsats (% av pris) <span id="hus-lbl-ki">15%</span></label>
+          <input type="range" id="hus-sl-ki" min="10" max="100" step="5" value="15">
+        </div>
+        <div class="slider-item">
+          <label>Ränta <span id="hus-lbl-ranta">4,5%</span></label>
+          <input type="range" id="hus-sl-ranta" min="3.0" max="8.0" step="0.25" value="4.5">
+        </div>
+        <div class="slider-item">
+          <label>Amortering (% av lån/år) <span id="hus-lbl-amor">2%</span></label>
+          <input type="range" id="hus-sl-amor" min="1" max="5" step="0.5" value="2">
+        </div>
+        <div class="slider-item">
+          <label>Driftkostnader/mån (el, vatten, underhåll) <span id="hus-lbl-drift">3 000 kr/mån</span></label>
+          <input type="range" id="hus-sl-drift" min="0" max="20000" step="500" value="3000">
+        </div>
+      </div>
+      <div style="margin-top:24px;padding-top:24px;border-top:1px solid #ddd8cc">
+        <div id="hus-spar-info" class="note-box"><span id="hus-spar-text"></span></div>
+      </div>
+    </div>
+
+    <div class="section-label">Scenarioanalys</div>
+    <div class="card" style="margin-bottom:24px; overflow-x:auto;">
+      <table class="sum-table">
+        <thead><tr>
+          <th>Scenario</th><th>Inkomst/mån netto</th><th>Total kostnad/mån</th><th>Kvar/mån</th><th>Klarar det?</th>
+        </tr></thead>
+        <tbody id="hus-scenario-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+    <div class="section-label">Rekommendation</div>
+    <div class="card dark" style="margin-bottom:24px">
+      <h3 id="hus-rek-rubrik">Beräknar...</h3>
+      <div class="stat-row"><span class="label">Trygg nedre gräns</span><span class="value pos" id="hus-rek-trygg">—</span></div>
+      <div class="stat-row"><span class="label">Balanserat (med buffert)</span><span class="value amber" id="hus-rek-balans">—</span></div>
+      <div class="stat-row"><span class="label">Kräver bästa scenario</span><span class="value neg" id="hus-rek-max">—</span></div>
+      <div class="stat-row"><span class="label">Rekommenderad kontantinsats</span><span class="value" id="hus-rek-ki">—</span></div>
+      <div class="stat-row"><span class="label">Behåll som buffert (minst)</span><span class="value pos" id="hus-rek-buffert">—</span></div>
+      <div class="note-box" style="background:rgba(200,217,184,0.1);border-color:var(--fern);color:var(--mist);margin-top:16px" id="hus-rek-note"></div>
+    </div>
+
+    <div class="card" style="margin-bottom:24px">
+      <h3>Ränteavdraget — hur mycket får ni tillbaka?</h3>
+      <p style="font-size:13px;color:var(--grey);margin-bottom:16px;line-height:1.6">30% avdrag upp till 100 000 kr/år, sedan 21% på resterande.</p>
+      <div class="stat-row"><span class="label">Befintligt lån — räntekostnad/år</span><span class="value mono" id="hus-rad-bef-kostnad">—</span></div>
+      <div class="stat-row"><span class="label">Husräntekostnad/år</span><span class="value mono" id="hus-rad-ny-kostnad">—</span></div>
+      <div class="stat-row"><span class="label">Avdrag totalt</span><span class="value pos" id="hus-rad-avdrag">—</span></div>
+      <div class="stat-row"><span class="label">Effektiv ränta hus efter avdrag</span><span class="value pos" id="hus-rad-effektiv">—</span></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════ FRITIDSHUS-PANEL -->
+  <div id="tab-fritidshus" class="tab-panel active">
   <!-- SLIDER -->
   <div class="divider"></div>
   <div class="section-label">Välj fritidshuspris</div>
@@ -1031,13 +1290,18 @@
     </div>
   </div>
 
-  <!-- RESULT BOX -->
+  </div><!-- /tab-fritidshus -->
+
+  <!-- RESULT BOX (delad, fast längst ner) -->
   <div class="result-box-placeholder"></div>
   <div id="result-box" class="result-box feasible">
     <div class="result-box-inner">
       <button class="res-toggle-btn" id="res-toggle" aria-label="Visa mer" onclick="toggleResultBox()">&#8963;</button>
       <div class="res-verdict-block">
-        <div class="res-label">Sammanfattad bedömning — Normalläge</div>
+        <div class="res-label" id="res-label">
+          <span class="res-tab-badge fritidshus" id="res-tab-badge">Fritidshus</span>
+          Sammanfattad bedömning
+        </div>
         <div class="res-verdict" id="res-verdict">Genomförbart med marginal</div>
         <div class="res-sub" id="res-sub">Kalkyl baserad på era inmatade värden</div>
       </div>
@@ -1322,6 +1586,84 @@
     update();
   }
 
+  // ─── DYNAMISKA LÅN ────────────────────────────────────────────────────────
+  let existingLoans = [{ desc: 'Bolån', belopp: 0, ranta: 3.0, amor: 0 }];
+
+  function getLoanTotals() {
+    return existingLoans.reduce((acc, l) => {
+      const belopp = +l.belopp || 0;
+      const ranta  = +l.ranta  || 0;
+      const amor   = +l.amor   || 0;
+      acc.totalBelopp   += belopp;
+      acc.totalRantaMan += belopp * ranta / 100 / 12;
+      acc.totalAmorMan  += amor;
+      acc.totalRantaAr  += belopp * ranta / 100;
+      return acc;
+    }, { totalBelopp: 0, totalRantaMan: 0, totalAmorMan: 0, totalRantaAr: 0 });
+  }
+
+  function renderLoans() {
+    const list = document.getElementById('loans-list');
+    list.innerHTML = existingLoans.map((l, i) => `
+      <div class="loan-row">
+        <div class="loan-row-head">
+          <input type="text" class="loan-desc-input" value="${l.desc}"
+            placeholder="t.ex. Bolån, Billån, Studielån…"
+            oninput="existingLoans[${i}].desc=this.value">
+          <button class="loan-remove-btn" onclick="removeLoan(${i})" title="Ta bort lån">✕</button>
+        </div>
+        <div class="input-grid">
+          <div class="input-item">
+            <label>Belopp (kr)</label>
+            <input type="number" value="${l.belopp}" step="50000"
+              oninput="existingLoans[${i}].belopp=+this.value; updateLoanTotal(); update()">
+          </div>
+          <div class="input-item">
+            <label>Ränta (%)</label>
+            <input type="number" value="${l.ranta}" step="0.1"
+              oninput="existingLoans[${i}].ranta=+this.value; updateLoanTotal(); update()">
+          </div>
+          <div class="input-item">
+            <label>Amortering (kr/mån)</label>
+            <input type="number" value="${l.amor}" step="500"
+              oninput="existingLoans[${i}].amor=+this.value; updateLoanTotal(); update()">
+            <span class="input-hint">0 om amorteringsfritt</span>
+          </div>
+        </div>
+      </div>`).join('');
+    updateLoanTotal();
+  }
+
+  function updateLoanTotal() {
+    const t = getLoanTotals();
+    const row = document.getElementById('loan-total-row');
+    const txt = document.getElementById('loan-total-text');
+    if (existingLoans.length > 1 || t.totalBelopp > 0) {
+      row.style.display = 'block';
+      const monthlyTotal = t.totalRantaMan + t.totalAmorMan;
+      txt.textContent = `${Math.round(monthlyTotal).toLocaleString('sv-SE')} kr/mån`
+        + (existingLoans.length > 1 ? ` (${existingLoans.length} lån, totalt ${Math.round(t.totalBelopp).toLocaleString('sv-SE')} kr)` : '');
+    } else {
+      row.style.display = 'none';
+    }
+  }
+
+  function addLoan() {
+    existingLoans.push({ desc: 'Nytt lån', belopp: 0, ranta: 3.0, amor: 0 });
+    renderLoans();
+  }
+
+  function removeLoan(idx) {
+    if (existingLoans.length <= 1) {
+      existingLoans[0] = { desc: 'Bolån', belopp: 0, ranta: 3.0, amor: 0 };
+      renderLoans();
+    } else {
+      existingLoans.splice(idx, 1);
+      renderLoans();
+    }
+    update();
+  }
+
   // ─── LÄSER IN ALLA INMATADE VÄRDEN ────────────────────────────────────────
   function getSettings() {
     const kommunalPct = +document.getElementById('in-kommunsats').value || 30;
@@ -1353,10 +1695,11 @@
       p1BonusAr:    +document.getElementById('in-p1-bonus').value   || 0,
       p2Netto:      p2Netto,
       p2BonusAr:    +document.getElementById('in-p2-bonus').value   || 0,
-      brfLan:       +document.getElementById('in-brf-lan').value    || 0,
-      brfRantaPct:  +document.getElementById('in-brf-ranta').value  || 0,
+      brfLan:       getLoanTotals().totalBelopp,
+      brfRantaMan:  getLoanTotals().totalRantaMan,
+      brfRantaAr:   getLoanTotals().totalRantaAr,
       brfAvgift:    +document.getElementById('in-brf-avgift').value || 0,
-      brfAmorMan:   +document.getElementById('in-brf-amor').value   || 0,
+      brfAmorMan:   getLoanTotals().totalAmorMan,
       el:           +document.getElementById('in-el').value         || 0,
       forsak:       +document.getElementById('in-forsak').value     || 0,
       tel:          +document.getElementById('in-tel').value        || 0,
@@ -1396,8 +1739,7 @@
   }
 
   function calcScenarios(s, fritidsKostMan, elFritids, hyraNettoMan, hushallFast) {
-    const brfRantaMan = s.brfLan * s.brfRantaPct / 100 / 12;
-    const fastaBRF = brfRantaMan + s.brfAvgift + s.brfAmorMan;
+    const fastaBRF = s.brfRantaMan + s.brfAvgift + s.brfAmorMan;
     const allaTotalt = fastaBRF + fritidsKostMan + elFritids + hushallFast + s.sparFonder + s.sparSemester;
 
     const p1BonusMan = s.p1BonusAr / 12;
@@ -1409,7 +1751,7 @@
     function verdikt(kvar) {
       if (kvar >= 8000) return {cls:'g', txt:'✓ Klarar'};
       if (kvar >= 0)    return {cls:'y', txt:'⚠ Tight'};
-      return {cls:'r', txt:'✗ Röd siffra'};
+      return {cls:'r', txt:'✗ Går inte ihop'};
     }
 
     const { p1: nm1, p2: nm2 } = getPersonNames();
@@ -1464,8 +1806,7 @@
 
   // Beräkna max köpeskilling för ett givet kvar-mål
   function maxPris(s, kiPct, rantaSats, amorPct, hyraNettoMan, hushallFast, targetKvar) {
-    const brfRantaMan = s.brfLan * s.brfRantaPct / 100 / 12;
-    const fastaBRF = brfRantaMan + s.brfAvgift + s.brfAmorMan;
+    const fastaBRF = s.brfRantaMan + s.brfAvgift + s.brfAmorMan;
     const elFritids = 1500;
     const inkomst = s.p1Netto + s.p2Netto + hyraNettoMan;
     const ovrigt = fastaBRF + elFritids + hushallFast + s.sparFonder + s.sparSemester;
@@ -1475,7 +1816,215 @@
     return (inkomst - ovrigt - targetKvar) / koeff;
   }
 
+  // ─── FLIKSTYRNING ─────────────────────────────────────────────────────────
+  let activeTab = 'fritidshus';
+
+  function switchTab(name) {
+    activeTab = name;
+    document.querySelectorAll('.tab-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.tab === name)
+    );
+    document.querySelectorAll('.tab-panel').forEach(p =>
+      p.classList.toggle('active', p.id === 'tab-' + name)
+    );
+    update();
+  }
+
   function update() {
+    if (activeTab === 'brf') updateBRF();
+    else if (activeTab === 'hus') updateHus();
+    else updateFritidshus();
+  }
+
+  // ─── HJÄLPFUNKTION: uppdatera den delade result-boxen ─────────────────────
+  function updateResultBox(propKostMan, totalSkuld, normalKvar, extraLabel, warns = [], tabName = 'fritidshus') {
+    const rb = document.getElementById('result-box');
+    document.getElementById('rm-lank').textContent  = fmt(propKostMan);
+    document.getElementById('rm-kvar').textContent  = fmt(normalKvar);
+    document.getElementById('rm-skuld').textContent = fmt(totalSkuld);
+    const s = getSettings();
+    const bruttoArsInkomst = (s.p1Netto + s.p2Netto) / 0.62 * 12;
+    document.getElementById('rm-ratio').textContent = bruttoArsInkomst > 0
+      ? (totalSkuld / bruttoArsInkomst).toFixed(1) + 'x' : '—';
+
+    // Tab-badge
+    const badge = document.getElementById('res-tab-badge');
+    const tabLabels = { brf: 'BRF', hus: 'Hus', fritidshus: 'Fritidshus' };
+    badge.textContent = tabLabels[tabName] || tabName;
+    badge.className = `res-tab-badge ${tabName}`;
+
+    // Varningar
+    document.getElementById('warnings').innerHTML = warns.map(w =>
+      `<div class="warn-pill">${w}</div>`).join('');
+
+    const label = extraLabel || '';
+    if (normalKvar >= 8000) {
+      rb.className = 'result-box feasible';
+      document.getElementById('res-verdict').textContent = 'Genomförbart med marginal';
+      document.getElementById('res-sub').textContent = `Ca ${fmt(normalKvar)} kvar per mån${label}`;
+    } else if (normalKvar >= 0) {
+      rb.className = 'result-box caution';
+      document.getElementById('res-verdict').textContent = 'Tight — kräver disciplin';
+      document.getElementById('res-sub').textContent = `Bara ${fmt(normalKvar)} kvar per mån${label}`;
+    } else {
+      rb.className = 'result-box risky';
+      document.getElementById('res-verdict').textContent = 'Budgeten går inte ihop';
+      document.getElementById('res-sub').textContent = `${fmt(Math.abs(normalKvar))} underskott per mån${label} — kräver högre inkomst eller lägre pris`;
+    }
+  }
+
+  // ─── HJÄLPFUNKTION: generisk rek-sektion ──────────────────────────────────
+  function updateRek(prefix, s, kiPct, rantaSats, amorPct, lan, pris, driftKostMan, hyraNettoMan, hushallFast) {
+    const roundTo100 = v => Math.round(v / 100000) * 100000;
+    const pTrygg  = maxPris(s, kiPct, rantaSats, amorPct, hyraNettoMan, hushallFast, 10000);
+    const pBalans = maxPris(s, kiPct, rantaSats, amorPct, hyraNettoMan, hushallFast, 2000);
+    const pMax    = maxPris(s, kiPct, rantaSats, amorPct, hyraNettoMan, hushallFast, -5000);
+    document.getElementById(prefix+'rek-trygg').textContent  = pTrygg > 0  ? `≤ ${fmt(roundTo100(pTrygg))}` : '—';
+    document.getElementById(prefix+'rek-balans').textContent = pBalans > 0 ? `${fmt(roundTo100(pTrygg))} – ${fmt(roundTo100(pBalans))}` : '—';
+    document.getElementById(prefix+'rek-max').textContent    = pMax > 0    ? `> ${fmt(roundTo100(pBalans))}` : '—';
+    const fastaBRF = s.brfRantaMan + s.brfAvgift + s.brfAmorMan;
+    const kiMin = s.kapital > 0
+      ? fmt(Math.round(roundTo100(pBalans) * 0.15)) + ' (15% av balanserat pris)'
+      : 'Minst 15% av köpeskillingen';
+    const buffert6 = Math.round((fastaBRF + hushallFast) * 6 / 50000) * 50000;
+    document.getElementById(prefix+'rek-ki').textContent = kiMin;
+    document.getElementById(prefix+'rek-buffert').textContent = fmt(buffert6) + ' (' + Math.round(buffert6 / ((fastaBRF + hushallFast) || 1)) + ' mån kostnader)';
+    const { p1: nm1, p2: nm2 } = getPersonNames();
+    document.getElementById(prefix+'rek-note').innerHTML =
+      `<strong>Kassaflödet:</strong> ${nm1} (${fmt(s.p1Netto)}/mån) och ${nm2} (${fmt(s.p2Netto)}/mån) ger ${fmt(s.p1Netto + s.p2Netto)}/mån kombinerat.
+      ${s.p1BonusAr > 0 ? `<br><br><strong>${nm1}:s bonus:</strong> ${fmt(s.p1BonusAr)}/år — använd till extra amortering.` : ''}
+      ${s.p2BonusAr > 0 ? `<br><br><strong>${nm2}:s bonus:</strong> ${fmt(s.p2BonusAr)}/år — använd till extra amortering.` : ''}`;
+  }
+
+  // ─── UPPDATERA BRF-FLIKEN ─────────────────────────────────────────────────
+  function updateBRF() {
+    const s = getSettings();
+    const pris      = +document.getElementById('brf-sl-pris').value;
+    const kiPct     = +document.getElementById('brf-sl-ki').value;
+    const rantaSats = +document.getElementById('brf-sl-ranta').value;
+    const amorPct   = +document.getElementById('brf-sl-amor').value;
+    const avgiftNy  = +document.getElementById('brf-sl-avgift').value;
+
+    document.getElementById('brf-lbl-pris').textContent   = fmt(pris);
+    document.getElementById('brf-lbl-ki').textContent     = kiPct + '%';
+    document.getElementById('brf-lbl-ranta').textContent  = rantaSats.toFixed(2).replace('.',',') + '%';
+    document.getElementById('brf-lbl-amor').textContent   = amorPct.toFixed(1).replace('.',',') + '%';
+    document.getElementById('brf-lbl-avgift').textContent = fmt(avgiftNy) + '/mån';
+
+    const ki = pris * kiPct / 100;
+    const lan = pris - ki;
+    const ranteKostMan = lan * rantaSats / 100 / 12;
+    const amorKostMan  = lan * amorPct / 100 / 12;
+    const propKostMan  = ranteKostMan + amorKostMan;
+    const hushallFast  = s.el + s.forsak + s.tel + s.stream + s.forskola + s.levnad;
+    const fastaBRF     = s.brfRantaMan + s.brfAvgift + s.brfAmorMan;
+    const allTotal     = fastaBRF + propKostMan + avgiftNy + hushallFast + s.sparFonder + s.sparSemester;
+    const totalSkuld   = s.brfLan + lan;
+    const normalInkomst = s.p1Netto + s.p2Netto;
+    const normalKvar   = normalInkomst - allTotal;
+
+    document.getElementById('brf-spar-text').innerHTML = `Totalt sparande: <strong>${fmt(s.sparFonder + s.sparSemester)}/mån</strong>. Befintliga lån räknas ovanpå detta.`;
+
+    const brfWarns = [];
+    if (s.kapital > 0 && ki > s.kapital * 0.45) brfWarns.push('⚠ Kontantinsats äter stor del av kapitalet');
+    if (ki > s.kapital && s.kapital > 0)         brfWarns.push('⚠ Kontantinsatsen överstiger tillgängligt kapital');
+    if (lan > 5000000)                            brfWarns.push('⚠ Stort lån på BRF');
+    if (totalSkuld > 10000000)                    brfWarns.push('⚠ Total skuld >10 Mkr');
+    if ((propKostMan + avgiftNy) > 25000)         brfWarns.push('⚠ BRF-kostnad >25 000 kr/mån');
+
+    updateResultBox(propKostMan + avgiftNy, totalSkuld, normalKvar, '', brfWarns, 'brf');
+
+    const scenarios = calcScenarios(s, propKostMan, avgiftNy, 0, hushallFast);
+    document.getElementById('brf-scenario-tbody').innerHTML = scenarios.map(sc => `
+      <tr>
+        <td><strong style="font-size:13px">${sc.name}</strong><br>
+        <span style="font-size:11px;color:var(--grey)">${sc.desc}</span></td>
+        <td class="mono">${fmt(sc.inkomst)}</td>
+        <td class="mono">${fmt(sc.totKost)}</td>
+        <td class="mono ${sc.kvar >= 8000 ? 'green' : sc.kvar >= 0 ? 'amber' : 'red'}">${fmt(sc.kvar)}</td>
+        <td><span class="badge ${sc.v.cls}">${sc.v.txt}</span></td>
+      </tr>`).join('');
+
+    document.getElementById('brf-rek-rubrik').textContent = `BRF under ${fmt(Math.round(maxPris(s, kiPct, rantaSats, amorPct, 0, hushallFast, 2000)/100000)*100000)} är rimligt`;
+    updateRek('brf-', s, kiPct, rantaSats, amorPct, lan, pris, avgiftNy, 0, hushallFast);
+
+    // Ränteavdrag
+    const nyRantaAr   = lan * rantaSats / 100;
+    const totalAvdrag = calcAvdrag(s.brfRantaAr + nyRantaAr);
+    const avdragBef   = calcAvdrag(s.brfRantaAr);
+    const effektiv    = nyRantaAr > 0 ? ((nyRantaAr - (totalAvdrag - avdragBef)) / lan * 100).toFixed(2).replace('.', ',') : '—';
+    document.getElementById('brf-rad-bef-kostnad').textContent = fmt(Math.round(s.brfRantaAr)) + '/år';
+    document.getElementById('brf-rad-ny-kostnad').textContent  = fmt(Math.round(nyRantaAr)) + '/år';
+    document.getElementById('brf-rad-avdrag').textContent      = fmt(Math.round(totalAvdrag)) + '/år';
+    document.getElementById('brf-rad-effektiv').textContent    = effektiv + '%';
+  }
+
+  // ─── UPPDATERA HUS-FLIKEN ─────────────────────────────────────────────────
+  function updateHus() {
+    const s = getSettings();
+    const pris      = +document.getElementById('hus-sl-pris').value;
+    const kiPct     = +document.getElementById('hus-sl-ki').value;
+    const rantaSats = +document.getElementById('hus-sl-ranta').value;
+    const amorPct   = +document.getElementById('hus-sl-amor').value;
+    const drift     = +document.getElementById('hus-sl-drift').value;
+
+    document.getElementById('hus-lbl-pris').textContent  = fmt(pris);
+    document.getElementById('hus-lbl-ki').textContent    = kiPct + '%';
+    document.getElementById('hus-lbl-ranta').textContent = rantaSats.toFixed(2).replace('.',',') + '%';
+    document.getElementById('hus-lbl-amor').textContent  = amorPct.toFixed(1).replace('.',',') + '%';
+    document.getElementById('hus-lbl-drift').textContent = fmt(drift) + '/mån';
+
+    const ki = pris * kiPct / 100;
+    const lan = pris - ki;
+    const ranteKostMan = lan * rantaSats / 100 / 12;
+    const amorKostMan  = lan * amorPct / 100 / 12;
+    const propKostMan  = ranteKostMan + amorKostMan;
+    const hushallFast  = s.el + s.forsak + s.tel + s.stream + s.forskola + s.levnad;
+    const fastaBRF     = s.brfRantaMan + s.brfAvgift + s.brfAmorMan;
+    const allTotal     = fastaBRF + propKostMan + drift + hushallFast + s.sparFonder + s.sparSemester;
+    const totalSkuld   = s.brfLan + lan;
+    const normalInkomst = s.p1Netto + s.p2Netto;
+    const normalKvar   = normalInkomst - allTotal;
+
+    document.getElementById('hus-spar-text').innerHTML = `Totalt sparande: <strong>${fmt(s.sparFonder + s.sparSemester)}/mån</strong>. Befintliga lån räknas ovanpå detta.`;
+
+    const husWarns = [];
+    if (s.kapital > 0 && (pris - lan) > s.kapital * 0.45) husWarns.push('⚠ Kontantinsats äter stor del av kapitalet');
+    if ((pris - lan) > s.kapital && s.kapital > 0)         husWarns.push('⚠ Kontantinsatsen överstiger tillgängligt kapital');
+    if (lan > 6000000)                                      husWarns.push('⚠ Stort huslån');
+    if (totalSkuld > 10000000)                              husWarns.push('⚠ Total skuld >10 Mkr');
+    if ((propKostMan + drift) > 30000)                      husWarns.push('⚠ Huskostnad >30 000 kr/mån');
+
+    updateResultBox(propKostMan + drift, totalSkuld, normalKvar, '', husWarns, 'hus');
+
+    const scenarios = calcScenarios(s, propKostMan, drift, 0, hushallFast);
+    document.getElementById('hus-scenario-tbody').innerHTML = scenarios.map(sc => `
+      <tr>
+        <td><strong style="font-size:13px">${sc.name}</strong><br>
+        <span style="font-size:11px;color:var(--grey)">${sc.desc}</span></td>
+        <td class="mono">${fmt(sc.inkomst)}</td>
+        <td class="mono">${fmt(sc.totKost)}</td>
+        <td class="mono ${sc.kvar >= 8000 ? 'green' : sc.kvar >= 0 ? 'amber' : 'red'}">${fmt(sc.kvar)}</td>
+        <td><span class="badge ${sc.v.cls}">${sc.v.txt}</span></td>
+      </tr>`).join('');
+
+    document.getElementById('hus-rek-rubrik').textContent = `Hus under ${fmt(Math.round(maxPris(s, kiPct, rantaSats, amorPct, 0, hushallFast, 2000)/100000)*100000)} är rimligt`;
+    updateRek('hus-', s, kiPct, rantaSats, amorPct, lan, pris, drift, 0, hushallFast);
+
+    // Ränteavdrag
+    const brfRantaAr  = s.brfRantaAr;
+    const nyRantaAr   = lan * rantaSats / 100;
+    const totalAvdrag = calcAvdrag(brfRantaAr + nyRantaAr);
+    const avdragBef   = calcAvdrag(brfRantaAr);
+    const effektiv    = nyRantaAr > 0 ? ((nyRantaAr - (totalAvdrag - avdragBef)) / lan * 100).toFixed(2).replace('.', ',') : '—';
+    document.getElementById('hus-rad-bef-kostnad').textContent = fmt(Math.round(brfRantaAr)) + '/år';
+    document.getElementById('hus-rad-ny-kostnad').textContent  = fmt(Math.round(nyRantaAr)) + '/år';
+    document.getElementById('hus-rad-avdrag').textContent      = fmt(Math.round(totalAvdrag)) + '/år';
+    document.getElementById('hus-rad-effektiv').textContent    = effektiv + '%';
+  }
+
+  // ─── UPPDATERA FRITIDSHUS-FLIKEN ──────────────────────────────────────────
+  function updateFritidshus() {
     const s = getSettings();
 
     // Slider-värden
@@ -1536,53 +2085,29 @@
     const fritidsKostMan = ranteKostMan + amorKostMan;
     const elFritids = 1500;
 
-    const brfRantaMan = s.brfLan * s.brfRantaPct / 100 / 12;
-    const fastaBRF = brfRantaMan + s.brfAvgift + s.brfAmorMan;
+    const fastaBRF = s.brfRantaMan + s.brfAvgift + s.brfAmorMan;
     const allTotal = fastaBRF + fritidsKostMan + elFritids + hushallFast + s.sparFonder + s.sparSemester;
 
     const totalSkuld = s.brfLan + lan;
     const bruttoArsInkomstP1 = s.p1Netto / 0.62 * 12; // approximera brutto från netto
-    const skuldRatio = bruttoArsInkomstP1 > 0 ? (totalSkuld / bruttoArsInkomstP1).toFixed(1) : '—';
+    const skuldRatioNum = bruttoArsInkomstP1 > 0 ? totalSkuld / bruttoArsInkomstP1 : 0;
 
     const normalInkomst = s.p1Netto + s.p2Netto + hyraNettoMan;
     const normalKvar = normalInkomst - allTotal;
 
-    // Resultat-box
-    const rb = document.getElementById('result-box');
-    const verdict = document.getElementById('res-verdict');
-    const sub = document.getElementById('res-sub');
-    document.getElementById('rm-lank').textContent = fmt(fritidsKostMan);
-    document.getElementById('rm-kvar').textContent = fmt(normalKvar);
-    document.getElementById('rm-skuld').textContent = fmt(totalSkuld);
-    document.getElementById('rm-ratio').textContent = skuldRatio + 'x';
-
+    // Resultat-box + varningar
     const hyraLabel = bruttoArHyra > 0 ? ` + Airbnb ${fmt(Math.round(hyraNettoMan))}/mån netto` : '';
 
-    if (normalKvar >= 8000) {
-      rb.className = 'result-box feasible';
-      verdict.textContent = 'Genomförbart med marginal';
-      sub.textContent = `Ca ${fmt(normalKvar)} kvar per mån — normalläge${hyraLabel}`;
-    } else if (normalKvar >= 0) {
-      rb.className = 'result-box caution';
-      verdict.textContent = 'Tight — kräver disciplin';
-      sub.textContent = `Bara ${fmt(normalKvar)} kvar per mån${hyraLabel}. Bonus/inkomstökning behövs som buffert.`;
-    } else {
-      rb.className = 'result-box risky';
-      verdict.textContent = 'Röd siffra i normalläge';
-      sub.textContent = `${fmt(Math.abs(normalKvar))} underskott/mån${hyraLabel}. Kräver bättre inkomstläge.`;
-    }
+    const fritidsWarns = [];
+    if (s.kapital > 0 && ki > s.kapital * 0.45)    fritidsWarns.push('⚠ Kontantinsats äter stor del av kapitalet');
+    if (ki > s.kapital && s.kapital > 0)            fritidsWarns.push('⚠ Kontantinsatsen överstiger tillgängligt kapital');
+    if (lan > 2000000)                              fritidsWarns.push('⚠ Stor fritidshusskuld');
+    if (totalSkuld > 10000000)                      fritidsWarns.push('⚠ Total skuld >10 Mkr');
+    if (skuldRatioNum > 8)                          fritidsWarns.push('⚠ Hög skuld/inkomst-ratio');
+    if (fritidsKostMan > 20000)                     fritidsWarns.push('⚠ Fritidshuskostnad >20k/mån');
+    if (bruttoArHyra > 0 && veckor > 10)            fritidsWarns.push('⚠ Många uthyrningsveckor — begränsar er egen användning');
 
-    // Varningar
-    const warnEl = document.getElementById('warnings');
-    const warns = [];
-    if (s.kapital > 0 && ki > s.kapital * 0.45) warns.push('⚠ Kontantinsats äter stor del av kapitalet');
-    if (lan > 2000000) warns.push('⚠ Stor fritidshusskuld');
-    if (totalSkuld > 10000000) warns.push('⚠ Total skuld >10 Mkr');
-    if (+skuldRatio > 8) warns.push('⚠ Hög skuld/inkomst-ratio');
-    if (fritidsKostMan > 20000) warns.push('⚠ Fritidshuskostnad >20k/mån');
-    if (bruttoArHyra > 0 && veckor > 10) warns.push('⚠ Många uthyrningsveckor — begränsar er egen användning');
-    if (ki > s.kapital && s.kapital > 0) warns.push('⚠ Kontantinsatsen överstiger tillgängligt kapital');
-    warnEl.innerHTML = warns.map(w => `<div class="warn-pill">${w}</div>`).join('');
+    updateResultBox(fritidsKostMan, totalSkuld, normalKvar, hyraLabel, fritidsWarns, 'fritidshus');
 
     // Scenariotabell
     const scenarios = calcScenarios(s, fritidsKostMan, elFritids, hyraNettoMan, hushallFast);
@@ -1623,7 +2148,7 @@
     ${s.p2BonusAr > 0 ? `<br><br><strong>${nm2}:s bonus:</strong> ${fmt(s.p2BonusAr)}/år netto — även denna bör styras mot amortering.` : ''}`;
 
     // Ränteavdrag
-    const brfRantaAr = s.brfLan * s.brfRantaPct / 100;
+    const brfRantaAr = s.brfRantaAr;
     const avdragBRF = calcAvdrag(brfRantaAr);
     const fritidsRantaAr = lan * rantaSats / 100;
     // Fritidshusräntan adderas på BRF-räntan — avdraget beräknas på totalen
@@ -1671,7 +2196,7 @@
     ['in-p1-namn','text'],     ['in-p2-namn','text'],
     ['in-p1-brutto','number'], ['in-p1-netto','number'], ['in-p1-bonus','number'],
     ['in-p2-brutto','number'], ['in-p2-netto','number'], ['in-p2-bonus','number'],
-    ['in-brf-lan','number'],   ['in-brf-ranta','number'],['in-brf-avgift','number'],['in-brf-amor','number'],
+    ['in-brf-avgift','number'],
     ['in-el','number'],        ['in-forsak','number'],   ['in-tel','number'],
     ['in-stream','number'],    ['in-forskola','number'], ['in-levnad','number'],
     ['in-kapital','number'],   ['in-spar-fonder','number'],['in-spar-semester','number'],
@@ -1680,6 +2205,8 @@
     ['in-kommun','select'],    ['in-kyrka','checkbox'],
     ['sl-pris','range'],       ['sl-ki','range'],        ['sl-ranta','range'],      ['sl-amor','range'],
     ['sl-hyra','range'],       ['sl-veckor','range'],
+    ['brf-sl-pris','range'],   ['brf-sl-ki','range'],    ['brf-sl-ranta','range'],  ['brf-sl-amor','range'],  ['brf-sl-avgift','range'],
+    ['hus-sl-pris','range'],   ['hus-sl-ki','range'],    ['hus-sl-ranta','range'],  ['hus-sl-amor','range'],  ['hus-sl-drift','range'],
   ];
 
   function saveData() {
@@ -1690,6 +2217,7 @@
       if (type === 'checkbox') data[id] = el.checked;
       else data[id] = el.value;
     });
+    data.existingLoans = existingLoans;
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
@@ -1735,6 +2263,11 @@
           if (type === 'checkbox') el.checked = data[id];
           else el.value = data[id];
         });
+        // Återställ lånlista om sparad
+        if (Array.isArray(data.existingLoans) && data.existingLoans.length > 0) {
+          existingLoans = data.existingLoans;
+          renderLoans();
+        }
         // Uppdatera kyrka-UI
         onKyrkaChange();
         // Uppdatera personnamns-etiketter
@@ -1755,6 +2288,8 @@
     'in-kyrka': false,
     'sl-pris': '2500000', 'sl-ki': '15', 'sl-ranta': '4.5',
     'sl-amor': '2', 'sl-hyra': '0', 'sl-veckor': '0',
+    'brf-sl-pris': '3000000', 'brf-sl-ki': '15', 'brf-sl-ranta': '4.5', 'brf-sl-amor': '2', 'brf-sl-avgift': '4000',
+    'hus-sl-pris': '4000000', 'hus-sl-ki': '15', 'hus-sl-ranta': '4.5', 'hus-sl-amor': '2', 'hus-sl-drift': '3000',
   };
 
   function resetData() {
@@ -1769,10 +2304,14 @@
     const sel = document.getElementById('in-kommun');
     if (sel) { sel.value = 'Stockholm'; onKommunChange(); }
     onKyrkaChange();
+    // Återställ lånlista
+    existingLoans = [{ desc: 'Bolån', belopp: 0, ranta: 3.0, amor: 0 }];
+    renderLoans();
     recalcNetto();
   }
 
   document.querySelectorAll('input[type=range]').forEach(el => el.addEventListener('input', update));
+  renderLoans();
   buildKommunDropdown();
   recalcNetto();
 </script>
