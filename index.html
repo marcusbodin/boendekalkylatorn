@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fritidshuskalkyl</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --forest: #1a2e1a;
+    --moss: #2d4a2d;
+    --sage: #4a6741;
+    --fern: #6b8f5e;
+    --mist: #c8d9b8;
+    --birch: #f0ebe0;
+    --cream: #faf7f2;
+    --amber: #c4872a;
+    --amber-light: #e8a83e;
+    --red: #c0392b;
+    --red-soft: #e74c3c;
+    --ink: #1a1a14;
+    --grey: #6b6b5a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding-bottom: 160px;
+  }
+
+  header {
+    background: var(--forest);
+    color: var(--birch);
+    padding: 48px 40px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 80% 50%, rgba(74,103,65,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse at 20% 80%, rgba(45,74,45,0.4) 0%, transparent 50%);
+  }
+
+  header::after {
+    content: '⌂';
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 120px;
+    opacity: 0.06;
+    line-height: 1;
+  }
+
+  header .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--fern);
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 700;
+    color: var(--birch);
+    line-height: 1.1;
+    position: relative;
+  }
+
+  header h1 span { color: var(--amber-light); }
+
+  header p.intro {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--mist);
+    max-width: 600px;
+    line-height: 1.6;
+    position: relative;
+  }
+
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* SECTION HEADERS */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--mist);
+  }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  @media(max-width: 700px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* CARDS */
+  .card {
+    background: white;
+    border: 1px solid #e8e4da;
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .card.dark {
+    background: var(--forest);
+    border-color: var(--moss);
+    color: var(--birch);
+  }
+
+  .card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--forest);
+  }
+  .card.dark h3 { color: var(--birch); }
+
+  /* STAT ROWS */
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0ebe0;
+    font-size: 14px;
+    gap: 12px;
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row .label { color: var(--grey); flex: 1; }
+  .stat-row .value {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .stat-row .value.neg { color: var(--red); }
+  .stat-row .value.pos { color: var(--sage); }
+  .stat-row .value.amber { color: var(--amber); }
+  .card.dark .stat-row { border-color: rgba(200,217,184,0.15); }
+  .card.dark .stat-row .label { color: var(--mist); }
+  .card.dark .stat-row .value { color: var(--birch); }
+
+  /* SETTINGS SECTION */
+  .settings-section {
+    background: white;
+    border: 1px solid #e8e4da;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+
+  .settings-group {
+    margin-bottom: 28px;
+  }
+  .settings-group:last-child { margin-bottom: 0; }
+
+  .settings-group-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--mist);
+  }
+
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .input-item label {
+    display: block;
+    font-size: 12px;
+    color: var(--grey);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .input-item input[type=number] {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid #ddd8cc;
+    border-radius: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--forest);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.15s;
+    -moz-appearance: textfield;
+  }
+  .input-item input[type=number]::-webkit-inner-spin-button,
+  .input-item input[type=number]::-webkit-outer-spin-button { opacity: 0.4; }
+  .input-item input[type=number]:focus {
+    border-color: var(--sage);
+    background: white;
+  }
+
+  .input-hint {
+    display: block;
+    font-size: 11px;
+    color: #aaa;
+    margin-top: 4px;
+  }
+
+  .netto-computed {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--sage);
+    font-family: 'DM Mono', monospace;
+  }
+  .netto-computed .netto-val {
+    font-weight: 500;
+    font-size: 13px;
+  }
+  .netto-computed .netto-tag {
+    font-size: 10px;
+    background: #e8f4e0;
+    color: var(--sage);
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .netto-computed.override .netto-tag {
+    background: #fef5d0;
+    color: var(--amber);
+  }
+
+  .input-item select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1.5px solid #ddd8cc;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--forest);
+    background: var(--cream);
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .input-item select:focus { border-color: var(--sage); background: white; }
+
+  /* ── Person-kort ─────────────────────────────────────── */
+  .person-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 600px) {
+    .person-cards { grid-template-columns: 1fr; }
+  }
+  .person-card {
+    background: #fafaf8;
+    border: 1.5px solid #ddd8cc;
+    border-radius: 12px;
+    padding: 18px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .person-card--1 { border-top: 3px solid var(--sage); }
+  .person-card--2 { border-top: 3px solid var(--amber); }
+
+  .person-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 2px;
+  }
+  .person-card-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+  }
+  .person-card--1 .person-card-num { background: #e8f4e0; color: var(--sage); }
+  .person-card--2 .person-card-num { background: #fef5d0; color: var(--amber); }
+
+  .person-name-input {
+    flex: 1;
+    border: none;
+    border-bottom: 2px solid #ddd8cc;
+    background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--forest);
+    padding: 2px 0 4px;
+    outline: none;
+    transition: border-color 0.15s;
+    min-width: 0;
+  }
+  .person-card--1 .person-name-input:focus { border-bottom-color: var(--sage); }
+  .person-card--2 .person-name-input:focus { border-bottom-color: var(--amber); }
+  .person-name-input::placeholder { color: #c0b8a8; font-weight: 400; }
+
+  .person-card .input-item label { font-size: 11px; }
+
+  .kyrko-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .kyrko-row input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--sage);
+    cursor: pointer;
+  }
+  .kyrko-row label {
+    font-size: 13px;
+    color: var(--grey);
+    cursor: pointer;
+    margin: 0;
+  }
+  .kyrko-rate-wrap {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .kyrko-rate-wrap.visible { display: flex; }
+  .kyrko-rate-wrap input {
+    width: 80px;
+    padding: 6px 10px;
+    border: 1.5px solid #ddd8cc;
+    border-radius: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--forest);
+    background: var(--cream);
+    outline: none;
+  }
+  .kyrko-rate-wrap span { font-size: 12px; color: var(--grey); }
+
+  /* SLIDER SECTION */
+  .slider-section {
+    background: var(--birch);
+    border: 1px solid #ddd8cc;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+
+  .slider-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    margin-bottom: 24px;
+    color: var(--forest);
+  }
+
+  .slider-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media(max-width: 600px) { .slider-group { grid-template-columns: 1fr; } }
+
+  .slider-item label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--grey);
+    margin-bottom: 8px;
+  }
+  .slider-item label span {
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+    color: var(--forest);
+    font-size: 14px;
+  }
+
+  input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    background: var(--mist);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--sage);
+    border: 3px solid white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+  /* På desktop: collapsible-innehåll alltid synligt som flex-rad */
+  .res-collapsible {
+    display: flex;
+    flex: 1;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  @media (min-width: 701px) {
+    .res-collapsible .res-metrics { flex: 1; }
+  }
+
+  /* RESULT BOX — fixerad längst ner */
+  .result-box {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    border-radius: 16px 16px 0 0;
+    padding: 16px 32px;
+    margin-bottom: 0;
+    overflow: hidden;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.25);
+  }
+
+  .result-box-placeholder { height: 200px; }
+
+  .result-box.feasible {
+    background: linear-gradient(135deg, #2d4a2d 0%, #1a2e1a 100%);
+    color: var(--birch);
+  }
+  .result-box.caution {
+    background: linear-gradient(135deg, #5a4a10 0%, #3a2e08 100%);
+    color: #fef0c0;
+  }
+  .result-box.risky {
+    background: linear-gradient(135deg, #6a1a0a 0%, #3a0a04 100%);
+    color: #fde0dc;
+  }
+
+  .result-box-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .result-box .res-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 2px;
+  }
+  .result-box .res-verdict {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+  .result-box .res-sub {
+    font-size: 12px;
+    opacity: 0.75;
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+
+  .res-verdict-block {
+    flex: 0 0 auto;
+    min-width: 220px;
+    padding-right: 24px;
+    border-right: 1px solid rgba(255,255,255,0.2);
+  }
+
+  .res-metrics {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+    flex-wrap: wrap;
+  }
+
+  .res-metric {
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    flex: 1;
+    min-width: 130px;
+  }
+  .res-metric .m-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .res-metric .m-lbl {
+    font-size: 10px;
+    opacity: 0.65;
+    line-height: 1.3;
+  }
+
+  /* MOBILLÄGE — expanderbar result-box */
+  .res-toggle-btn {
+    display: none;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 12px;
+    padding: 2px 16px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 1;
+    transition: transform 0.25s;
+    color: inherit;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  @media (max-width: 700px) {
+    .res-toggle-btn { display: flex; }
+
+    .result-box-inner {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .res-verdict-block {
+      border-right: none;
+      padding-right: 0;
+      width: 100%;
+    }
+
+    .result-box .res-verdict { white-space: normal; font-size: 17px; }
+    .result-box .res-sub { white-space: normal; }
+
+    .res-collapsible {
+      display: block;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.3s ease, opacity 0.25s ease;
+      width: 100%;
+    }
+
+    .result-box.expanded .res-collapsible { max-height: 500px; opacity: 1; }
+    .result-box.expanded .res-toggle-btn { transform: rotate(180deg); }
+    .result-box-placeholder { height: 90px; }
+  }
+
+  /* WARNING PILLS */
+  .warnings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .warn-pill {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* SUMMARY TABLE */
+  .sum-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .sum-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--sage);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--mist);
+  }
+  .sum-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f0ebe0;
+    vertical-align: middle;
+  }
+  .sum-table tr:last-child td { border-bottom: none; }
+  .sum-table .mono { font-family: 'DM Mono', monospace; font-size: 12px; }
+  .sum-table .green { color: var(--sage); font-weight: 500; }
+  .sum-table .red { color: var(--red); font-weight: 500; }
+  .sum-table .amber { color: var(--amber); font-weight: 500; }
+  .sum-table tr:hover td { background: #faf7f2; }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+  }
+  .badge.g { background: #e8f4e0; color: #2d5a1a; }
+  .badge.y { background: #fef5d0; color: #7a5a10; }
+  .badge.r { background: #fde8e4; color: #8a1a0a; }
+
+  .note-box {
+    background: #f0f7ec;
+    border-left: 3px solid var(--sage);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #2d4a20;
+    margin-top: 16px;
+  }
+  .note-box strong { font-weight: 500; }
+
+  .divider { height: 32px; }
+
+  footer {
+    text-align: center;
+    padding: 32px;
+    font-size: 12px;
+    color: var(--grey);
+    border-top: 1px solid #e8e4da;
+    margin-top: 20px;
+  }
+
+  /* SPARA / LADDA */
+  .data-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--birch);
+    border: 1px solid #ddd8cc;
+    border-radius: 10px;
+    padding: 12px 20px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: var(--grey);
+  }
+  .data-bar-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-right: 4px;
+    white-space: nowrap;
+  }
+  .data-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 8px;
+    border: 1.5px solid;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .data-btn.save {
+    background: var(--forest);
+    border-color: var(--forest);
+    color: var(--birch);
+  }
+  .data-btn.save:hover { background: var(--moss); border-color: var(--moss); }
+  .data-btn.load {
+    background: white;
+    border-color: #ddd8cc;
+    color: var(--forest);
+  }
+  .data-btn.load:hover { border-color: var(--sage); color: var(--sage); }
+  .data-btn.reset {
+    background: transparent;
+    border-color: transparent;
+    color: var(--grey);
+    font-size: 12px;
+    padding: 7px 10px;
+  }
+  .data-btn.reset:hover { color: var(--red); }
+  #file-input-hidden { display: none; }
+  .data-saved-msg {
+    font-size: 12px;
+    color: var(--sage);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .data-saved-msg.show { opacity: 1; }
+
+  .drop-zone {
+    flex: 1;
+    min-width: 180px;
+    border: 2px dashed #c8d4b8;
+    border-radius: 8px;
+    padding: 10px 16px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--grey);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--sage);
+    background: #f0f7ec;
+    color: var(--sage);
+  }
+  .drop-zone.dragover {
+    background: #e4f2dc;
+    transform: scale(1.01);
+  }
+  .drop-zone .drop-icon {
+    font-size: 18px;
+    display: block;
+    margin-bottom: 2px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="subtitle">Ekonomikalkyl · Fritidshus</div>
+  <h1>Vad har ni råd med<br>för <span>fritidshus?</span></h1>
+  <p class="intro">Fyll i er ekonomiska situation och justera parametrarna för att se vad ni kan köpa — med scenarier för trygghet, försiktighet och maximal exponering.</p>
+</header>
+
+<div class="main">
+
+  <!-- SPARA / LADDA -->
+  <div class="divider"></div>
+  <div class="data-bar">
+    <span class="data-bar-label">Din data</span>
+    <button class="data-btn save" onclick="saveData()">⬇ Spara data</button>
+    <div class="drop-zone" id="drop-zone"
+         onclick="document.getElementById('file-input-hidden').click()"
+         ondragover="onDragOver(event)"
+         ondragleave="onDragLeave(event)"
+         ondrop="onDrop(event)">
+      <span class="drop-icon">⬆</span>
+      Släpp JSON-fil här eller klicka för att ladda
+    </div>
+    <input type="file" id="file-input-hidden" accept=".json" onchange="loadData(event)">
+    <button class="data-btn reset" onclick="resetData()">✕ Rensa allt</button>
+    <span class="data-saved-msg" id="saved-msg">✓ Sparad!</span>
+  </div>
+
+  <!-- ER EKONOMI -->
+  <div class="section-label">Er ekonomi</div>
+
+  <div class="settings-section">
+
+    <div class="settings-group">
+      <div class="settings-group-label">Skatteberäkning</div>
+      <div class="input-grid">
+        <div class="input-item">
+          <label>Kommun</label>
+          <select id="in-kommun" onchange="onKommunChange()"></select>
+          <span class="input-hint">Påverkar kommunalskatt + landsting</span>
+        </div>
+        <div class="input-item">
+          <label>Anpassad kommunalskatt (%)</label>
+          <input type="number" id="in-kommunsats" value="29.70" step="0.01" oninput="recalcNetto()">
+          <span class="input-hint">Ändras automatiskt vid kommunval</span>
+        </div>
+        <div class="input-item" style="display:flex;flex-direction:column;justify-content:center">
+          <label>Svenska kyrkan</label>
+          <div class="kyrko-row">
+            <input type="checkbox" id="in-kyrka" onchange="onKyrkaChange()">
+            <label for="in-kyrka">Medlem i Svenska kyrkan</label>
+          </div>
+          <div class="kyrko-rate-wrap" id="kyrko-rate-wrap">
+            <input type="number" id="in-kyrko-sats" value="1.02" step="0.01" oninput="recalcNetto()">
+            <span>% kyrkoavgift</span>
+          </div>
+          <span class="input-hint">Kyrkoavgiften varierar per församling</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-label">Inkomster</div>
+      <div class="person-cards">
+
+        <!-- ── Person 1 ── -->
+        <div class="person-card person-card--1">
+          <div class="person-card-header">
+            <span class="person-card-num">1</span>
+            <input type="text" class="person-name-input" id="in-p1-namn" value="" placeholder="Person 1" oninput="updatePersonLabels()">
+          </div>
+          <div class="input-item">
+            <label>Bruttolön/mån</label>
+            <input type="number" id="in-p1-brutto" value="0" step="1000" oninput="recalcNetto()">
+            <div class="netto-computed" id="p1-netto-display">
+              <span>→ Netto:</span>
+              <span class="netto-val" id="p1-netto-val">—</span>
+              <span class="netto-tag">Beräknat</span>
+            </div>
+          </div>
+          <div class="input-item">
+            <label>Netto/mån <span style="font-size:10px;color:#aaa">(override)</span></label>
+            <input type="number" id="in-p1-netto" value="" step="500" oninput="onNettoOverride('p1')" placeholder="Lämna tomt för auto">
+            <span class="input-hint">Fyll i om du vill styra nettot manuellt</span>
+          </div>
+          <div class="input-item">
+            <label>Bonus netto/år</label>
+            <input type="number" id="in-p1-bonus" value="0" step="10000" oninput="update()">
+            <span class="input-hint">0 om ingen bonus</span>
+          </div>
+        </div>
+
+        <!-- ── Person 2 ── -->
+        <div class="person-card person-card--2">
+          <div class="person-card-header">
+            <span class="person-card-num">2</span>
+            <input type="text" class="person-name-input" id="in-p2-namn" value="" placeholder="Person 2" oninput="updatePersonLabels()">
+          </div>
+          <div class="input-item">
+            <label>Bruttolön/mån</label>
+            <input type="number" id="in-p2-brutto" value="0" step="1000" oninput="recalcNetto()">
+            <div class="netto-computed" id="p2-netto-display">
+              <span>→ Netto:</span>
+              <span class="netto-val" id="p2-netto-val">—</span>
+              <span class="netto-tag">Beräknat</span>
+            </div>
+          </div>
+          <div class="input-item">
+            <label>Netto/mån <span style="font-size:10px;color:#aaa">(override)</span></label>
+            <input type="number" id="in-p2-netto" value="" step="500" oninput="onNettoOverride('p2')" placeholder="Lämna tomt för auto">
+            <span class="input-hint">Fyll i om du vill styra nettot manuellt</span>
+          </div>
+          <div class="input-item">
+            <label>Bonus netto/år</label>
+            <input type="number" id="in-p2-bonus" value="0" step="10000" oninput="update()">
+            <span class="input-hint">0 om ingen bonus</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-label">Befintliga lån &amp; boende</div>
+      <div class="input-grid">
+        <div class="input-item">
+          <label>Befintligt bolån (kr)</label>
+          <input type="number" id="in-brf-lan" value="0" step="50000" oninput="update()">
+          <span class="input-hint">0 om inget lån</span>
+        </div>
+        <div class="input-item">
+          <label>Ränta befintligt lån (%)</label>
+          <input type="number" id="in-brf-ranta" value="3.0" step="0.1" oninput="update()">
+        </div>
+        <div class="input-item">
+          <label>Månadsavgift / hyra (kr)</label>
+          <input type="number" id="in-brf-avgift" value="0" step="100" oninput="update()">
+          <span class="input-hint">BRF-avgift eller hyra</span>
+        </div>
+        <div class="input-item">
+          <label>Amortering befintligt lån (kr/mån)</label>
+          <input type="number" id="in-brf-amor" value="0" step="500" oninput="update()">
+          <span class="input-hint">0 om amorteringsfritt</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-label">Övriga fasta kostnader per månad</div>
+      <div class="input-grid">
+        <div class="input-item">
+          <label>El &amp; uppvärmning</label>
+          <input type="number" id="in-el" value="0" step="100" oninput="update()">
+        </div>
+        <div class="input-item">
+          <label>Försäkring</label>
+          <input type="number" id="in-forsak" value="0" step="50" oninput="update()">
+        </div>
+        <div class="input-item">
+          <label>Telefoni</label>
+          <input type="number" id="in-tel" value="0" step="50" oninput="update()">
+        </div>
+        <div class="input-item">
+          <label>Streaming &amp; abonnemang</label>
+          <input type="number" id="in-stream" value="0" step="50" oninput="update()">
+        </div>
+        <div class="input-item">
+          <label>Förskola / barnomsorg</label>
+          <input type="number" id="in-forskola" value="0" step="100" oninput="update()">
+          <span class="input-hint">0 om ej aktuellt</span>
+        </div>
+        <div class="input-item">
+          <label>Mat, transport &amp; övrigt</label>
+          <input type="number" id="in-levnad" value="0" step="500" oninput="update()">
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-label">Tillgångar &amp; sparande</div>
+      <div class="input-grid">
+        <div class="input-item">
+          <label>Tillgängligt kapital (fonder/sparkonto)</label>
+          <input type="number" id="in-kapital" value="0" step="50000" oninput="update()">
+          <span class="input-hint">Används för kontantinsats &amp; buffert</span>
+        </div>
+        <div class="input-item">
+          <label>Månadssparande fonder (kr/mån)</label>
+          <input type="number" id="in-spar-fonder" value="0" step="1000" oninput="update()">
+          <span class="input-hint">Omfördelningsbart vid behov</span>
+        </div>
+        <div class="input-item">
+          <label>Semesterkonto (kr/mån)</label>
+          <input type="number" id="in-spar-semester" value="0" step="500" oninput="update()">
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-group">
+      <div class="settings-group-label">Riskscenarier</div>
+      <div class="input-grid">
+        <div class="input-item">
+          <label>Ränteuppgång befintligt lån (procentenheter)</label>
+          <input type="number" id="in-rante-risk" value="2" step="0.5" oninput="update()">
+          <span class="input-hint">Simuleras i scenariotabellen</span>
+        </div>
+        <div class="input-item">
+          <label>Ev. amorteringskrav befintligt lån (% av lån/år)</label>
+          <input type="number" id="in-amor-risk" value="1" step="0.5" oninput="update()">
+          <span class="input-hint">Om amorteringskrav tillkommer framöver</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SLIDER -->
+  <div class="divider"></div>
+  <div class="section-label">Välj fritidshuspris</div>
+  <div class="slider-section">
+    <h2>Justera fritidshusparametrar</h2>
+    <div class="slider-group">
+      <div class="slider-item">
+        <label>Köpeskilling fritidshus <span id="lbl-pris">2 500 000 kr</span></label>
+        <input type="range" id="sl-pris" min="500000" max="5000000" step="100000" value="2500000">
+      </div>
+      <div class="slider-item">
+        <label>Kontantinsats (% av pris) <span id="lbl-ki">15%</span></label>
+        <input type="range" id="sl-ki" min="10" max="100" step="5" value="15">
+      </div>
+      <div class="slider-item">
+        <label>Ränta fritidshus <span id="lbl-ranta">4,5%</span></label>
+        <input type="range" id="sl-ranta" min="3.0" max="8.0" step="0.25" value="4.5">
+      </div>
+      <div class="slider-item">
+        <label>Amortering fritidshus (% av lån/år) <span id="lbl-amor">2%</span></label>
+        <input type="range" id="sl-amor" min="1" max="5" step="0.5" value="2">
+      </div>
+    </div>
+
+    <div style="margin-top:24px;padding-top:24px;border-top:1px solid #ddd8cc">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--sage);margin-bottom:16px">Uthyrning av fritidshuset (Airbnb)</div>
+      <div class="slider-group">
+        <div class="slider-item">
+          <label>Pris per natt (Airbnb) <span id="lbl-hyra">0 kr/natt</span></label>
+          <input type="range" id="sl-hyra" min="0" max="5000" step="100" value="0">
+        </div>
+        <div class="slider-item">
+          <label>Antal uthyrningsveckor per år <span id="lbl-veckor">0 veckor</span></label>
+          <input type="range" id="sl-veckor" min="0" max="16" step="1" value="6">
+        </div>
+      </div>
+      <div id="hyra-info" class="note-box" style="margin-top:16px;display:none">
+        <span id="hyra-text"></span>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;padding-top:24px;border-top:1px solid #ddd8cc">
+      <div id="spar-info" class="note-box">
+        <span id="spar-text"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT BOX -->
+  <div class="result-box-placeholder"></div>
+  <div id="result-box" class="result-box feasible">
+    <div class="result-box-inner">
+      <button class="res-toggle-btn" id="res-toggle" aria-label="Visa mer" onclick="toggleResultBox()">&#8963;</button>
+      <div class="res-verdict-block">
+        <div class="res-label">Sammanfattad bedömning — Normalläge</div>
+        <div class="res-verdict" id="res-verdict">Genomförbart med marginal</div>
+        <div class="res-sub" id="res-sub">Kalkyl baserad på era inmatade värden</div>
+      </div>
+      <div class="res-collapsible">
+        <div class="res-metrics" style="margin-top:12px">
+          <div class="res-metric"><div class="m-val" id="rm-lank">—</div><div class="m-lbl">Total lånekostnad/mån (ränta + amor)</div></div>
+          <div class="res-metric"><div class="m-val" id="rm-kvar">—</div><div class="m-lbl">Kvar efter alla fasta kostn.</div></div>
+          <div class="res-metric"><div class="m-val" id="rm-skuld">—</div><div class="m-lbl">Total skuldsättning</div></div>
+          <div class="res-metric"><div class="m-val" id="rm-ratio">—</div><div class="m-lbl">Skuld/inkomst-ratio (brutto)</div></div>
+        </div>
+        <div class="warnings" id="warnings"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIO TABLE -->
+  <div class="section-label">Scenarioanalys</div>
+  <div class="card" style="margin-bottom:24px; overflow-x:auto;">
+    <table class="sum-table" id="scenario-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Inkomst/mån netto</th>
+          <th>Total kostnad/mån</th>
+          <th>Kvar/mån</th>
+          <th>Klarar det?</th>
+        </tr>
+      </thead>
+      <tbody id="scenario-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- REKOMMENDATION -->
+  <div class="divider"></div>
+  <div class="section-label">Rekommendation</div>
+  <div class="card dark" style="margin-bottom:24px" id="rekommendation-card">
+    <h3 id="rek-rubrik">Beräknar...</h3>
+    <div class="stat-row"><span class="label">Trygg nedre gräns (liten exponering)</span><span class="value pos" id="rek-trygg">—</span></div>
+    <div class="stat-row"><span class="label">Balanserat (med buffert)</span><span class="value amber" id="rek-balans">—</span></div>
+    <div class="stat-row"><span class="label">Kräver bästa scenario</span><span class="value neg" id="rek-max">—</span></div>
+    <div class="stat-row"><span class="label">Rekommenderad kontantinsats</span><span class="value" id="rek-ki">—</span></div>
+    <div class="stat-row"><span class="label">Behåll som buffert (minst)</span><span class="value pos" id="rek-buffert">—</span></div>
+    <div class="note-box" style="background:rgba(200,217,184,0.1);border-color:var(--fern);color:var(--mist);margin-top:16px" id="rek-note">
+    </div>
+  </div>
+
+  <!-- LÅN VS FONDER -->
+  <div class="divider"></div>
+  <div class="section-label">Ska ni sälja fonder eller ta mer lån?</div>
+  <div class="card" style="margin-bottom:20px">
+    <h3 style="margin-bottom:20px">Matematiken talar för att behålla fonderna</h3>
+    <div class="grid-2" style="gap:24px;margin-bottom:20px">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sage);margin-bottom:10px">OM NI SÄLJER FONDER</div>
+        <div class="stat-row"><span class="label">Kapitalskatt på vinst (30%)</span><span class="value neg">Omedelbart läckage</span></div>
+        <div class="stat-row"><span class="label">Förlorad framtida avkastning</span><span class="value neg">7–10%/år historiskt</span></div>
+        <div class="stat-row"><span class="label">Likviditeten minskar</span><span class="value neg">Sämre buffert</span></div>
+        <div class="stat-row"><span class="label">Lägre skuldbörda</span><span class="value pos">Psykologisk trygghet</span></div>
+        <div class="stat-row"><span class="label">Lägre räntekostnad/mån</span><span class="value pos">Bättre kassaflöde</span></div>
+      </div>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sage);margin-bottom:10px">OM NI BEHÅLLER FONDER &amp; LÅNAR MER</div>
+        <div class="stat-row"><span class="label">Fondavkastning (historisk snitt)</span><span class="value pos">~8%/år</span></div>
+        <div class="stat-row"><span class="label">Räntekostnad fritidshus (efter avdrag)</span><span class="value neg" id="lf-rantakost">~3,2–4,5% effektivt</span></div>
+        <div class="stat-row"><span class="label">Nettovinst att behålla fonder</span><span class="value pos">+3–5% per år</span></div>
+        <div class="stat-row"><span class="label">Ränteavdrag 30% (upp till 100k)</span><span class="value pos">Sänker effektiv ränta</span></div>
+        <div class="stat-row"><span class="label">Fonderna kvar som buffert</span><span class="value pos">Viktigt skyddsnät</span></div>
+      </div>
+    </div>
+    <div class="note-box">
+      <strong>Slutsats:</strong> Matematiskt är det nästan alltid fördelaktigt att låna mer och behålla fonderna, givet att lånekostnaden (effektivt ca 3–4,5% efter ränteavdrag) understiger förväntad fondavkastning (~8%/år). Fonderna är dessutom er viktigaste trygghetsbuffert. Använd dem enbart till den lagstadgade minimiinsatsen (15%) och lån resten.
+    </div>
+  </div>
+
+  <!-- RÄNTEAVDRAG -->
+  <div class="card" style="margin-bottom:24px">
+    <h3>Ränteavdraget — hur mycket får ni tillbaka?</h3>
+    <p style="font-size:13px;color:var(--grey);margin-bottom:16px;line-height:1.6">I Sverige får ni dra av 30% av räntekostnader upp till 100 000 kr/år, sedan 21% på överstigande belopp. Ränteavdraget betalas ut i deklarationen (april/maj påföljande år).</p>
+    <div class="stat-row"><span class="label">Befintligt lån — räntekostnad/år</span><span class="value mono" id="rad-brf-kostnad">—</span></div>
+    <div class="stat-row"><span class="label">Avdrag befintligt lån</span><span class="value pos" id="rad-brf-avdrag">—</span></div>
+    <div class="stat-row"><span class="label">Fritidshusränta/år (vid valt pris &amp; ränta)</span><span class="value mono" id="rad-fritids-kostnad">—</span></div>
+    <div class="stat-row"><span class="label">Avdrag fritidshus</span><span class="value pos" id="rad-fritids-avdrag">—</span></div>
+    <div class="stat-row"><span class="label">Effektiv ränta fritidshus efter avdrag</span><span class="value pos" id="rad-effektiv">—</span></div>
+    <div class="note-box" style="margin-top:16px">
+      Tänk på ränteavdraget i kassaflödesplaneringen — pengarna kommer i deklarationen, inte löpande. Ni kan ansöka om preliminär skattejustering via Skatteverket för att få det månadsvis.
+    </div>
+  </div>
+
+  <!-- FONDSTRATEGI -->
+  <div class="section-label" id="fond-label">Kapitalstrategi</div>
+  <div class="grid-3" style="margin-bottom:32px" id="fond-grid">
+    <div class="card" style="border-top:3px solid var(--sage)">
+      <h3>Kontantinsats</h3>
+      <div style="font-family:'DM Mono',monospace;font-size:28px;color:var(--sage);margin:12px 0" id="fond-ki-val">—</div>
+      <p style="font-size:13px;color:var(--grey);line-height:1.6">Exakt 15% av köpeskillingen. Sätt in minimumet — det är allt ni behöver. Mer kontantinsats ger sämre matematisk avkastning givet fondernas förväntade avkastning.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--red)">
+      <h3>Rör inte — likviditetsbuffert</h3>
+      <div style="font-family:'DM Mono',monospace;font-size:28px;color:var(--red);margin:12px 0" id="fond-buffert-val">—</div>
+      <p style="font-size:13px;color:var(--grey);line-height:1.6">Er säkerhetslina. Täcker 6–8 månader av alla fasta kostnader vid inkomstbortfall. Ta inte risk med den här delen.</p>
+    </div>
+    <div class="card" style="border-top:3px solid var(--amber)">
+      <h3>Flexibel reserv</h3>
+      <div style="font-family:'DM Mono',monospace;font-size:28px;color:var(--amber);margin:12px 0" id="fond-reserv-val">—</div>
+      <p style="font-size:13px;color:var(--grey);line-height:1.6">Kvar för renovering, möbler, oförutsedda kostnader på fritidshuset. Placera på sparkonto eller kort räntefond — inte i aktiefonder om ni kan behöva pengarna inom 1–2 år.</p>
+    </div>
+  </div>
+
+  <!-- BONUSSTRATEGI -->
+  <div id="bonus-sektion" style="display:none">
+    <div class="section-label">Bonusen — er motor</div>
+    <div class="card dark" style="margin-bottom:32px">
+      <h3>Använd bonusen strategiskt, inte till levnadskostnader</h3>
+      <div class="stat-row"><span class="label">Bonus netto/år</span><span class="value pos" id="bon-netto">—</span></div>
+      <div class="stat-row"><span class="label">Räkna INTE in bonusen i månadsbudgeten</span><span class="value amber">Behandla som icke-existerande</span></div>
+      <div class="stat-row"><span class="label">År 1–3: Amortera fritidshuset extra</span><span class="value pos">Sänk skulden snabbt</span></div>
+      <div class="stat-row"><span class="label">Möjlig extra amortering per år</span><span class="value pos" id="bon-amor">—</span></div>
+      <div class="note-box" style="background:rgba(200,217,184,0.1);border-color:var(--fern);color:var(--mist);margin-top:16px" id="bon-note">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Räkneexemplet är ett pedagogiskt verktyg och inte finansiell rådgivning. Konsultera en privatekonomisk rådgivare och er bank innan köp. Skatteberäkningar är approximativa.
+  Boendekostnad inkluderar ej el, vatten, underhåll på fritidshuset.
+</footer>
+
+<script>
+  // ─── KOMMUNDATA (kommunal + landsting, totalt %) ──────────────────────────
+  const KOMMUNER = {
+    'Ale': 33.64, 'Alingsås': 33.65, 'Alvesta': 33.77,
+    'Arboga': 32.69, 'Arvika': 33.35,
+    'Botkyrka': 32.69, 'Borås': 32.90,
+    'Danderyd': 29.40, 'Ekerö': 30.40, 'Eskilstuna': 33.25,
+    'Falun': 33.27, 'Gävle': 33.00, 'Göteborg': 32.35,
+    'Haninge': 32.22, 'Helsingborg': 30.92, 'Huddinge': 31.60,
+    'Härnösand': 33.98, 'Hässleholm': 32.27,
+    'Järfälla': 31.32, 'Jönköping': 32.55,
+    'Kalmar': 32.83, 'Karlskrona': 32.70, 'Karlstad': 32.80,
+    'Kristianstad': 32.47, 'Kungälv': 33.26,
+    'Lidingö': 29.97, 'Linköping': 31.47, 'Ljungby': 33.16,
+    'Luleå': 33.27, 'Lund': 30.97,
+    'Malmö': 32.35, 'Motala': 32.59,
+    'Nacka': 29.70, 'Norrköping': 32.47, 'Norrtälje': 31.97,
+    'Nyköping': 32.27, 'Nynäshamn': 33.47,
+    'Sigtuna': 32.20, 'Skellefteå': 33.30, 'Sollentuna': 29.62,
+    'Solna': 29.85, 'Stockholm': 29.83, 'Sundbyberg': 31.50,
+    'Sundsvall': 32.87, 'Södertälje': 32.07,
+    'Täby': 29.11, 'Tyresö': 31.97,
+    'Uddevalla': 33.30, 'Umeå': 32.48, 'Upplands Väsby': 31.95,
+    'Uppsala': 32.42,
+    'Vallentuna': 30.84, 'Varberg': 32.47, 'Vaxholm': 29.90,
+    'Vetlanda': 34.02, 'Visby': 33.29, 'Västerås': 32.12,
+    'Växjö': 32.47, 'Värmdö': 30.80,
+    'Örebro': 32.30, 'Östersund': 33.45,
+    'Annan (ange nedan)': null,
+  };
+
+  // Bygg kommundropdown
+  function buildKommunDropdown() {
+    const sel = document.getElementById('in-kommun');
+    Object.keys(KOMMUNER).sort((a,b) => {
+      if (a === 'Annan (ange nedan)') return 1;
+      if (b === 'Annan (ange nedan)') return -1;
+      return a.localeCompare(b, 'sv');
+    }).forEach(k => {
+      const opt = document.createElement('option');
+      opt.value = k;
+      opt.textContent = k + (KOMMUNER[k] ? ` (${KOMMUNER[k].toFixed(2)}%)` : '');
+      if (k === 'Stockholm') opt.selected = true;
+      sel.appendChild(opt);
+    });
+    onKommunChange();
+  }
+
+  function onKommunChange() {
+    const k = document.getElementById('in-kommun').value;
+    const sats = KOMMUNER[k];
+    const inp = document.getElementById('in-kommunsats');
+    if (sats !== null) {
+      inp.value = sats.toFixed(2);
+      inp.readOnly = true;
+      inp.style.opacity = '0.6';
+    } else {
+      inp.readOnly = false;
+      inp.style.opacity = '1';
+      inp.focus();
+    }
+    recalcNetto();
+  }
+
+  function onKyrkaChange() {
+    const checked = document.getElementById('in-kyrka').checked;
+    document.getElementById('kyrko-rate-wrap').classList.toggle('visible', checked);
+    recalcNetto();
+  }
+
+  // ─── SKATTEBERÄKNING: BRUTTO → NETTO ──────────────────────────────────────
+  // Baserat på Skatteverkets regler 2025 (jobbskatteavdrag, grundavdrag, statlig skatt)
+  function calcNettoManad(bruttoManad, kommunalPct, kyrkoMedlem, kyrkoSatsPct) {
+    if (bruttoManad <= 0) return 0;
+    const Gar = bruttoManad * 12;
+    const kr  = kommunalPct / 100;
+    const pbB = 58800; // prisbasbelopp 2025
+
+    // Grundavdrag (förenklat, platå för medelinkomster)
+    let ga;
+    if      (Gar <= 0.99 * pbB)  ga = 0.423 * Gar;
+    else if (Gar <= 2.72 * pbB)  ga = 0.423 * 0.99 * pbB;
+    else if (Gar <= 7.88 * pbB)  ga = 0.310 * pbB - 0.1 * (Gar - 3.11 * pbB);
+    else                          ga = 0.125 * pbB;
+    ga = Math.max(0, Math.min(ga, 0.310 * pbB));
+
+    // Kommunalskatt
+    const kommunalSkatt = (Gar - ga) * kr;
+
+    // Statlig inkomstskatt (20% över skiktgräns ~614 000/år)
+    const statligSkatt = Math.max(0, Gar - 614000) * 0.20;
+
+    // Jobbskatteavdrag (JSA)
+    const g1 = 0.91 * pbB, g2 = 3.0 * pbB, g3 = 8.08 * pbB, g4 = 13.54 * pbB;
+    let jsa = 0;
+    if (Gar > g1) {
+      const max1 = kr * (g2 - g1);
+      const max2 = max1 + kr * 0.122 * (g3 - g2);
+      if      (Gar <= g2) jsa = kr * (Gar - g1);
+      else if (Gar <= g3) jsa = max1 + kr * 0.122 * (Gar - g2);
+      else if (Gar <= g4) jsa = max2 - 0.03 * (Gar - g3);
+      else                 jsa = Math.max(0, max2 - 0.03 * (g4 - g3));
+    }
+    jsa = Math.max(0, jsa);
+
+    // Kyrkoavgift
+    const kyrko = kyrkoMedlem ? (Gar - ga) * (kyrkoSatsPct / 100) : 0;
+
+    const netto = Gar - kommunalSkatt - statligSkatt - kyrko + jsa;
+    return Math.max(0, netto / 12);
+  }
+
+  // Håller reda på om netto är manuellt åsidosatt
+  const nettoOverride = { p1: false, p2: false };
+
+  function onNettoOverride(person) {
+    update();
+  }
+
+  function getPersonNames() {
+    const n1 = (document.getElementById('in-p1-namn').value || '').trim();
+    const n2 = (document.getElementById('in-p2-namn').value || '').trim();
+    return { p1: n1 || 'Person 1', p2: n2 || 'Person 2' };
+  }
+
+  function updatePersonLabels() {
+    // Etiketterna i korten behöver inte uppdateras (inget namnprefix).
+    // Trigga om-beräkning så scenariobeskrivningar använder senaste namn.
+    update();
+  }
+
+  function recalcNetto() {
+    const kommunalPct = +document.getElementById('in-kommunsats').value || 30;
+    const kyrkoMedlem = document.getElementById('in-kyrka').checked;
+    const kyrkoSats   = +document.getElementById('in-kyrko-sats').value || 1.02;
+
+    // Person 1
+    const p1Brutto = +document.getElementById('in-p1-brutto').value || 0;
+    const p1NettoCalc = calcNettoManad(p1Brutto, kommunalPct, kyrkoMedlem, kyrkoSats);
+    document.getElementById('p1-netto-val').textContent = p1NettoCalc > 0 ? Math.round(p1NettoCalc).toLocaleString('sv-SE') + ' kr/mån' : '—';
+
+    // Sätt netto-override om tomt
+    const p1NettoInp = document.getElementById('in-p1-netto');
+    if (!p1NettoInp.value) {
+      // Auto-fylls via getSettings som kollar nedan
+    }
+
+    // Person 2
+    const p2Brutto = +document.getElementById('in-p2-brutto').value || 0;
+    const p2NettoCalc = calcNettoManad(p2Brutto, kommunalPct, kyrkoMedlem, kyrkoSats);
+    document.getElementById('p2-netto-val').textContent = p2NettoCalc > 0 ? Math.round(p2NettoCalc).toLocaleString('sv-SE') + ' kr/mån' : '—';
+
+    update();
+  }
+
+  // ─── LÄSER IN ALLA INMATADE VÄRDEN ────────────────────────────────────────
+  function getSettings() {
+    const kommunalPct = +document.getElementById('in-kommunsats').value || 30;
+    const kyrkoMedlem = document.getElementById('in-kyrka').checked;
+    const kyrkoSats   = +document.getElementById('in-kyrko-sats').value || 1.02;
+
+    // P1 netto: override-fält eller beräknat från brutto
+    const p1NettoOverride = +document.getElementById('in-p1-netto').value;
+    const p1BruttoVal     = +document.getElementById('in-p1-brutto').value || 0;
+    const p1Netto = p1NettoOverride || calcNettoManad(p1BruttoVal, kommunalPct, kyrkoMedlem, kyrkoSats);
+
+    // Uppdatera tag
+    const p1Tag = document.querySelector('#p1-netto-display .netto-tag');
+    if (p1Tag) p1Tag.textContent = p1NettoOverride ? 'Manuellt' : 'Beräknat';
+    const p1Display = document.getElementById('p1-netto-display');
+    if (p1Display) p1Display.classList.toggle('override', !!p1NettoOverride);
+
+    // P2 netto: override-fält eller beräknat från brutto
+    const p2NettoOverride = +document.getElementById('in-p2-netto').value;
+    const p2BruttoVal     = +document.getElementById('in-p2-brutto').value || 0;
+    const p2Netto = p2NettoOverride || calcNettoManad(p2BruttoVal, kommunalPct, kyrkoMedlem, kyrkoSats);
+
+    const p2Tag = document.querySelector('#p2-netto-display .netto-tag');
+    if (p2Tag) p2Tag.textContent = p2NettoOverride ? 'Manuellt' : 'Beräknat';
+    const p2Display = document.getElementById('p2-netto-display');
+    if (p2Display) p2Display.classList.toggle('override', !!p2NettoOverride);
+    return {
+      p1Netto:      p1Netto,
+      p1BonusAr:    +document.getElementById('in-p1-bonus').value   || 0,
+      p2Netto:      p2Netto,
+      p2BonusAr:    +document.getElementById('in-p2-bonus').value   || 0,
+      brfLan:       +document.getElementById('in-brf-lan').value    || 0,
+      brfRantaPct:  +document.getElementById('in-brf-ranta').value  || 0,
+      brfAvgift:    +document.getElementById('in-brf-avgift').value || 0,
+      brfAmorMan:   +document.getElementById('in-brf-amor').value   || 0,
+      el:           +document.getElementById('in-el').value         || 0,
+      forsak:       +document.getElementById('in-forsak').value     || 0,
+      tel:          +document.getElementById('in-tel').value        || 0,
+      stream:       +document.getElementById('in-stream').value     || 0,
+      forskola:     +document.getElementById('in-forskola').value   || 0,
+      levnad:       +document.getElementById('in-levnad').value     || 0,
+      kapital:      +document.getElementById('in-kapital').value    || 0,
+      sparFonder:   +document.getElementById('in-spar-fonder').value || 0,
+      sparSemester: +document.getElementById('in-spar-semester').value || 0,
+      ranteRisk:    +document.getElementById('in-rante-risk').value || 0,
+      amorRisk:     +document.getElementById('in-amor-risk').value  || 0,
+    };
+  }
+
+  function fmt(n) {
+    return Math.round(n).toLocaleString('sv-SE') + ' kr';
+  }
+
+  function fmtTkr(n) {
+    return Math.round(n / 1000) + ' tkr';
+  }
+
+  // Ränteavdrag: 30% upp till 100 000 kr/år, 21% på resten
+  function calcAvdrag(rantaAr) {
+    if (rantaAr <= 0) return 0;
+    const del1 = Math.min(rantaAr, 100000) * 0.30;
+    const del2 = Math.max(0, rantaAr - 100000) * 0.21;
+    return del1 + del2;
+  }
+
+  // Skatteberäkning uthyrning: schablonavdrag 40 000 kr + 20% av intäkten
+  function calcHyraNettoAr(bruttoAr) {
+    if (bruttoAr <= 0) return 0;
+    const avdrag = 40000 + 0.2 * bruttoAr;
+    const skattepliktig = Math.max(0, bruttoAr - avdrag);
+    return bruttoAr - skattepliktig * 0.30;
+  }
+
+  function calcScenarios(s, fritidsKostMan, elFritids, hyraNettoMan, hushallFast) {
+    const brfRantaMan = s.brfLan * s.brfRantaPct / 100 / 12;
+    const fastaBRF = brfRantaMan + s.brfAvgift + s.brfAmorMan;
+    const allaTotalt = fastaBRF + fritidsKostMan + elFritids + hushallFast + s.sparFonder + s.sparSemester;
+
+    const p1BonusMan = s.p1BonusAr / 12;
+    const p2BonusMan = s.p2BonusAr / 12;
+    const ranteRiskExtra = s.brfLan * s.ranteRisk / 100 / 12;
+    const amorRiskExtra = s.brfLan * s.amorRisk / 100 / 12;
+    const bggaNetto = s.p1Netto + s.p2Netto;
+
+    function verdikt(kvar) {
+      if (kvar >= 8000) return {cls:'g', txt:'✓ Klarar'};
+      if (kvar >= 0)    return {cls:'y', txt:'⚠ Tight'};
+      return {cls:'r', txt:'✗ Röd siffra'};
+    }
+
+    const { p1: nm1, p2: nm2 } = getPersonNames();
+    const scenarios = [
+      {
+        name: 'Normalläge',
+        desc: `${nm1} + ${nm2} lön`,
+        inkomst: bggaNetto + hyraNettoMan,
+      },
+      ...(s.p1BonusAr > 0 ? [{
+        name: `${nm1} bonus`,
+        desc: `${nm1} lön + bonus/12 + ${nm2} lön`,
+        inkomst: bggaNetto + p1BonusMan + hyraNettoMan,
+      }] : []),
+      ...(s.p2BonusAr > 0 ? [{
+        name: `${nm2} bonus`,
+        desc: `${nm1} lön + ${nm2} lön + bonus/12`,
+        inkomst: bggaNetto + p2BonusMan + hyraNettoMan,
+      }] : []),
+      ...(s.p1BonusAr > 0 && s.p2BonusAr > 0 ? [{
+        name: 'Bägge bonus',
+        desc: 'Båda löner + båda bonusar/12',
+        inkomst: bggaNetto + p1BonusMan + p2BonusMan + hyraNettoMan,
+      }] : []),
+      ...(s.ranteRisk > 0 ? [{
+        name: `Ränta +${s.ranteRisk}% befintligt lån`,
+        desc: 'Ränteuppgång vid omsättning',
+        inkomst: bggaNetto + hyraNettoMan,
+        extra_kost: ranteRiskExtra,
+      }] : []),
+      ...(s.amorRisk > 0 ? [{
+        name: 'Amorteringskrav tillkommer',
+        desc: `${s.amorRisk}% av befintligt lån/år`,
+        inkomst: bggaNetto + hyraNettoMan,
+        extra_kost: amorRiskExtra,
+      }] : []),
+      {
+        name: 'Sämsta läge',
+        desc: 'Alla risker slår till, ingen bonus',
+        inkomst: bggaNetto + hyraNettoMan,
+        extra_kost: ranteRiskExtra + amorRiskExtra,
+      },
+    ];
+
+    return scenarios.map(sc => {
+      const extraKost = sc.extra_kost || 0;
+      const totKost = allaTotalt + extraKost;
+      const kvar = sc.inkomst - totKost;
+      return { ...sc, totKost, kvar, v: verdikt(kvar) };
+    });
+  }
+
+  // Beräkna max köpeskilling för ett givet kvar-mål
+  function maxPris(s, kiPct, rantaSats, amorPct, hyraNettoMan, hushallFast, targetKvar) {
+    const brfRantaMan = s.brfLan * s.brfRantaPct / 100 / 12;
+    const fastaBRF = brfRantaMan + s.brfAvgift + s.brfAmorMan;
+    const elFritids = 1500;
+    const inkomst = s.p1Netto + s.p2Netto + hyraNettoMan;
+    const ovrigt = fastaBRF + elFritids + hushallFast + s.sparFonder + s.sparSemester;
+    // pris * (1 - ki/100) * (ranta + amor) / 100 / 12 = inkomst - ovrigt - targetKvar
+    const koeff = (1 - kiPct / 100) * (rantaSats + amorPct) / 100 / 12;
+    if (koeff <= 0) return Infinity;
+    return (inkomst - ovrigt - targetKvar) / koeff;
+  }
+
+  function update() {
+    const s = getSettings();
+
+    // Slider-värden
+    const pris      = +document.getElementById('sl-pris').value;
+    const kiPct     = +document.getElementById('sl-ki').value;
+    const rantaSats = +document.getElementById('sl-ranta').value;
+    const amorPct   = +document.getElementById('sl-amor').value;
+    const prisPerNatt = +document.getElementById('sl-hyra').value;
+    const veckor    = +document.getElementById('sl-veckor').value;
+
+    // Uppdatera slider-labels
+    document.getElementById('lbl-pris').textContent = fmt(pris);
+    document.getElementById('lbl-ki').textContent = kiPct + '%';
+    document.getElementById('lbl-ranta').textContent = rantaSats.toFixed(2).replace('.',',') + '%';
+    document.getElementById('lbl-amor').textContent = amorPct.toFixed(1).replace('.',',') + '%';
+    document.getElementById('lbl-hyra').textContent = prisPerNatt > 0 ? fmt(prisPerNatt) + '/natt' : '0 kr/natt (ej uthyrd)';
+    document.getElementById('lbl-veckor').textContent = veckor > 0 ? veckor + ' veckor' : '0 veckor';
+
+    // Hushållskostnader (exkl BRF-lån/-avgift och sparande)
+    const hushallFast = s.el + s.forsak + s.tel + s.stream + s.forskola + s.levnad;
+
+    // Sparinfo
+    const sparAr = (s.sparFonder + s.sparSemester) * 12;
+    const sparText = document.getElementById('spar-text');
+    sparText.innerHTML = `Totalt målsparande: <strong>${fmt(s.sparFonder + s.sparSemester)}/mån = ${fmt(sparAr)}/år.</strong>
+      Fonder: vid 8% avkastning är ${fmt(s.sparFonder * 12)}/år → ca <strong>${fmt(Math.round(s.sparFonder * 12 * 10))}</strong> om 10 år.
+      Semester: ${fmt(s.sparSemester * 12)}/år = ca ${fmt(s.sparSemester * 6)} per resa om ni reser två gånger/år.
+      ${s.sparFonder === 0 && s.sparSemester === 0 ? ' <span style="color:var(--red)">⚠ Inget sparande — extremläge.</span>' : ''}`;
+
+    // Airbnb-kalkyl
+    const bruttoArHyra = veckor > 0 && prisPerNatt > 0 ? prisPerNatt * veckor * 7 : 0;
+    const hyraNettoMan = calcHyraNettoAr(bruttoArHyra) / 12;
+    const hyraInfoEl = document.getElementById('hyra-info');
+    const hyraTextEl = document.getElementById('hyra-text');
+
+    if (prisPerNatt > 0 && veckor > 0) {
+      const nettoAr = calcHyraNettoAr(bruttoArHyra);
+      const avdrag = 40000 + 0.2 * bruttoArHyra;
+      const skattepliktig = Math.max(0, bruttoArHyra - avdrag);
+      const skatt = skattepliktig * 0.30;
+      hyraInfoEl.style.display = 'block';
+      hyraTextEl.innerHTML = `<strong>Airbnb-kalkyl:</strong> ${veckor} veckor × 7 nätter × ${fmt(prisPerNatt)}/natt = <strong>${fmt(Math.round(bruttoArHyra))}/år brutto.</strong><br>
+      Schablonavdrag: ${fmt(Math.round(avdrag))}. Skattepliktig: ${fmt(Math.round(skattepliktig))}. Skatt (30%): ${fmt(Math.round(skatt))}.
+      <strong>Netto efter skatt: ${fmt(Math.round(nettoAr))}/år = ${fmt(Math.round(hyraNettoMan))}/mån.</strong><br>
+      <span style="color:var(--sage)">Schablonavdraget gör att inkomster upp till ca 50 000 kr/år är i princip skattefria.</span>`;
+    } else if (prisPerNatt > 0) {
+      hyraInfoEl.style.display = 'block';
+      hyraTextEl.innerHTML = `Sätt antal uthyrningsveckor för att se kalkylen. Pris: ${fmt(prisPerNatt)}/natt.`;
+    } else {
+      hyraInfoEl.style.display = 'none';
+    }
+
+    // Lånekostnader
+    const ki = pris * kiPct / 100;
+    const lan = pris - ki;
+    const ranteKostMan = lan * rantaSats / 100 / 12;
+    const amorKostMan  = lan * amorPct / 100 / 12;
+    const fritidsKostMan = ranteKostMan + amorKostMan;
+    const elFritids = 1500;
+
+    const brfRantaMan = s.brfLan * s.brfRantaPct / 100 / 12;
+    const fastaBRF = brfRantaMan + s.brfAvgift + s.brfAmorMan;
+    const allTotal = fastaBRF + fritidsKostMan + elFritids + hushallFast + s.sparFonder + s.sparSemester;
+
+    const totalSkuld = s.brfLan + lan;
+    const bruttoArsInkomstP1 = s.p1Netto / 0.62 * 12; // approximera brutto från netto
+    const skuldRatio = bruttoArsInkomstP1 > 0 ? (totalSkuld / bruttoArsInkomstP1).toFixed(1) : '—';
+
+    const normalInkomst = s.p1Netto + s.p2Netto + hyraNettoMan;
+    const normalKvar = normalInkomst - allTotal;
+
+    // Resultat-box
+    const rb = document.getElementById('result-box');
+    const verdict = document.getElementById('res-verdict');
+    const sub = document.getElementById('res-sub');
+    document.getElementById('rm-lank').textContent = fmt(fritidsKostMan);
+    document.getElementById('rm-kvar').textContent = fmt(normalKvar);
+    document.getElementById('rm-skuld').textContent = fmt(totalSkuld);
+    document.getElementById('rm-ratio').textContent = skuldRatio + 'x';
+
+    const hyraLabel = bruttoArHyra > 0 ? ` + Airbnb ${fmt(Math.round(hyraNettoMan))}/mån netto` : '';
+
+    if (normalKvar >= 8000) {
+      rb.className = 'result-box feasible';
+      verdict.textContent = 'Genomförbart med marginal';
+      sub.textContent = `Ca ${fmt(normalKvar)} kvar per mån — normalläge${hyraLabel}`;
+    } else if (normalKvar >= 0) {
+      rb.className = 'result-box caution';
+      verdict.textContent = 'Tight — kräver disciplin';
+      sub.textContent = `Bara ${fmt(normalKvar)} kvar per mån${hyraLabel}. Bonus/inkomstökning behövs som buffert.`;
+    } else {
+      rb.className = 'result-box risky';
+      verdict.textContent = 'Röd siffra i normalläge';
+      sub.textContent = `${fmt(Math.abs(normalKvar))} underskott/mån${hyraLabel}. Kräver bättre inkomstläge.`;
+    }
+
+    // Varningar
+    const warnEl = document.getElementById('warnings');
+    const warns = [];
+    if (s.kapital > 0 && ki > s.kapital * 0.45) warns.push('⚠ Kontantinsats äter stor del av kapitalet');
+    if (lan > 2000000) warns.push('⚠ Stor fritidshusskuld');
+    if (totalSkuld > 10000000) warns.push('⚠ Total skuld >10 Mkr');
+    if (+skuldRatio > 8) warns.push('⚠ Hög skuld/inkomst-ratio');
+    if (fritidsKostMan > 20000) warns.push('⚠ Fritidshuskostnad >20k/mån');
+    if (bruttoArHyra > 0 && veckor > 10) warns.push('⚠ Många uthyrningsveckor — begränsar er egen användning');
+    if (ki > s.kapital && s.kapital > 0) warns.push('⚠ Kontantinsatsen överstiger tillgängligt kapital');
+    warnEl.innerHTML = warns.map(w => `<div class="warn-pill">${w}</div>`).join('');
+
+    // Scenariotabell
+    const scenarios = calcScenarios(s, fritidsKostMan, elFritids, hyraNettoMan, hushallFast);
+    const tbody = document.getElementById('scenario-tbody');
+    tbody.innerHTML = scenarios.map(sc => `
+      <tr>
+        <td>
+          <strong style="font-size:13px">${sc.name}</strong><br>
+          <span style="font-size:11px;color:var(--grey)">${sc.desc}</span>
+        </td>
+        <td class="mono">${fmt(sc.inkomst)}</td>
+        <td class="mono">${fmt(sc.totKost)}</td>
+        <td class="mono ${sc.kvar >= 8000 ? 'green' : sc.kvar >= 0 ? 'amber' : 'red'}">${fmt(sc.kvar)}</td>
+        <td><span class="badge ${sc.v.cls}">${sc.v.txt}</span></td>
+      </tr>
+    `).join('');
+
+    // Rekommendation — beräkna dynamiska prisgränser
+    const pTrygg  = maxPris(s, kiPct, rantaSats, amorPct, hyraNettoMan, hushallFast, 10000);
+    const pBalans = maxPris(s, kiPct, rantaSats, amorPct, hyraNettoMan, hushallFast, 2000);
+    const pMax    = maxPris(s, kiPct, rantaSats, amorPct, hyraNettoMan, hushallFast, -5000);
+    const roundTo100 = v => Math.round(v / 100000) * 100000;
+
+    document.getElementById('rek-trygg').textContent  = pTrygg > 0  ? `≤ ${fmt(roundTo100(pTrygg))}` : '—';
+    document.getElementById('rek-balans').textContent = pBalans > 0 ? `${fmt(roundTo100(pTrygg))} – ${fmt(roundTo100(pBalans))}` : '—';
+    document.getElementById('rek-max').textContent    = pMax > 0    ? `> ${fmt(roundTo100(pBalans))}` : '—';
+
+    const kiMin = s.kapital > 0 ? fmt(Math.round(roundTo100(pBalans) * 0.15)) + ' (15% av balanserat pris)' : 'Minst 15% av köpeskillingen';
+    const buffert6 = Math.round((fastaBRF + hushallFast) * 6 / 50000) * 50000;
+    document.getElementById('rek-ki').textContent = kiMin;
+    document.getElementById('rek-buffert').textContent = fmt(buffert6) + ' (' + Math.round(buffert6 / ((fastaBRF + hushallFast) || 1)) + ' mån kostnader)';
+    document.getElementById('rek-rubrik').textContent = `Fritidshus under ${fmt(roundTo100(pBalans))} är rimligt`;
+
+    const { p1: nm1, p2: nm2 } = getPersonNames();
+    const rekNote = document.getElementById('rek-note');
+    rekNote.innerHTML = `<strong>Kassaflödet:</strong> ${nm1} (${fmt(s.p1Netto)}/mån) och ${nm2} (${fmt(s.p2Netto)}/mån) ger en kombinerad nettoinkomst på ${fmt(s.p1Netto + s.p2Netto)}/mån. Räkna inte in bonus i månadsbudgeten — använd den för extra amortering.
+    ${s.p1BonusAr > 0 ? `<br><br><strong>${nm1}:s bonus:</strong> ${fmt(s.p1BonusAr)}/år netto ger möjlighet att amortera ned fritidshusskulden snabbt under de första åren.` : ''}
+    ${s.p2BonusAr > 0 ? `<br><br><strong>${nm2}:s bonus:</strong> ${fmt(s.p2BonusAr)}/år netto — även denna bör styras mot amortering.` : ''}`;
+
+    // Ränteavdrag
+    const brfRantaAr = s.brfLan * s.brfRantaPct / 100;
+    const avdragBRF = calcAvdrag(brfRantaAr);
+    const fritidsRantaAr = lan * rantaSats / 100;
+    // Fritidshusräntan adderas på BRF-räntan — avdraget beräknas på totalen
+    const totalRantaAr = brfRantaAr + fritidsRantaAr;
+    const totalAvdrag = calcAvdrag(totalRantaAr);
+    const avdragFritids = totalAvdrag - avdragBRF;
+    const effektivRanta = fritidsRantaAr > 0 ? ((fritidsRantaAr - avdragFritids) / lan * 100).toFixed(2).replace('.', ',') : '—';
+
+    document.getElementById('rad-brf-kostnad').textContent = fmt(Math.round(brfRantaAr)) + '/år';
+    document.getElementById('rad-brf-avdrag').textContent = fmt(Math.round(avdragBRF)) + '/år';
+    document.getElementById('rad-fritids-kostnad').textContent = fmt(Math.round(fritidsRantaAr)) + '/år';
+    document.getElementById('rad-fritids-avdrag').textContent = fmt(Math.round(avdragFritids)) + '/år = ' + fmt(Math.round(avdragFritids / 12)) + '/mån';
+    document.getElementById('rad-effektiv').textContent = effektivRanta + '% (vs ' + rantaSats.toFixed(2).replace('.', ',') + '% nominellt)';
+    document.getElementById('lf-rantakost').textContent = '~' + effektivRanta + '% effektivt';
+
+    // Fondstrategi
+    const kiMin15 = pris * 0.15;
+    const buffertBehov = buffert6;
+    const reserv = s.kapital - kiMin15 - buffertBehov;
+    document.getElementById('fond-ki-val').textContent = fmtTkr(kiMin15);
+    document.getElementById('fond-buffert-val').textContent = '≥ ' + fmtTkr(buffertBehov);
+    document.getElementById('fond-reserv-val').textContent = reserv > 0 ? fmtTkr(reserv) : '0 tkr (stretchat)';
+
+    // Bonusstrategi
+    const bonusSek = document.getElementById('bonus-sektion');
+    if (s.p1BonusAr > 0) {
+      bonusSek.style.display = 'block';
+      document.getElementById('bon-netto').textContent = fmt(s.p1BonusAr) + '/år';
+      document.getElementById('bon-amor').textContent = fmt(s.p1BonusAr) + '/år (om allt används till amortering)';
+      const arTillAvbetalat = lan > 0 ? (lan / s.p1BonusAr).toFixed(1) : '—';
+      document.getElementById('bon-note').innerHTML = `Med ${fmt(s.p1BonusAr)}/år i bonus kan ni på ${arTillAvbetalat} år betala av hela fritidshusskulden om ni använder allt. Alternativt: halvera bonusen till amortering och spara resten i pensionssparande (IPS/kapitalförsäkring) för skatteoptimering — värt att diskutera med en rådgivare.`;
+    } else {
+      bonusSek.style.display = 'none';
+    }
+  }
+
+  function toggleResultBox() {
+    document.getElementById('result-box').classList.toggle('expanded');
+  }
+
+  // ─── SPARA / LADDA / RENSA DATA ────────────────────────────────────────────
+
+  // Alla fält som ska sparas: [id, typ]
+  const SAVE_FIELDS = [
+    ['in-p1-namn','text'],     ['in-p2-namn','text'],
+    ['in-p1-brutto','number'], ['in-p1-netto','number'], ['in-p1-bonus','number'],
+    ['in-p2-brutto','number'], ['in-p2-netto','number'], ['in-p2-bonus','number'],
+    ['in-brf-lan','number'],   ['in-brf-ranta','number'],['in-brf-avgift','number'],['in-brf-amor','number'],
+    ['in-el','number'],        ['in-forsak','number'],   ['in-tel','number'],
+    ['in-stream','number'],    ['in-forskola','number'], ['in-levnad','number'],
+    ['in-kapital','number'],   ['in-spar-fonder','number'],['in-spar-semester','number'],
+    ['in-rante-risk','number'],['in-amor-risk','number'],
+    ['in-kommunsats','number'],['in-kyrko-sats','number'],
+    ['in-kommun','select'],    ['in-kyrka','checkbox'],
+    ['sl-pris','range'],       ['sl-ki','range'],        ['sl-ranta','range'],      ['sl-amor','range'],
+    ['sl-hyra','range'],       ['sl-veckor','range'],
+  ];
+
+  function saveData() {
+    const data = { version: 1 };
+    SAVE_FIELDS.forEach(([id, type]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (type === 'checkbox') data[id] = el.checked;
+      else data[id] = el.value;
+    });
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'fritidshus-kalkyl.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    const msg = document.getElementById('saved-msg');
+    msg.classList.add('show');
+    setTimeout(() => msg.classList.remove('show'), 2000);
+  }
+
+  function onDragOver(e) {
+    e.preventDefault();
+    document.getElementById('drop-zone').classList.add('dragover');
+  }
+  function onDragLeave(e) {
+    document.getElementById('drop-zone').classList.remove('dragover');
+  }
+  function onDrop(e) {
+    e.preventDefault();
+    document.getElementById('drop-zone').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) readJsonFile(file);
+  }
+
+  function loadData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    readJsonFile(file);
+    event.target.value = '';
+  }
+
+  function readJsonFile(file) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        SAVE_FIELDS.forEach(([id, type]) => {
+          if (!(id in data)) return;
+          const el = document.getElementById(id);
+          if (!el) return;
+          if (type === 'checkbox') el.checked = data[id];
+          else el.value = data[id];
+        });
+        // Uppdatera kyrka-UI
+        onKyrkaChange();
+        // Uppdatera personnamns-etiketter
+        updatePersonLabels();
+        // Uppdatera kommunsats (kan vara manuell override)
+        recalcNetto();
+      } catch(err) {
+        alert('Kunde inte läsa filen — kontrollera att det är en giltig kalkyl-fil.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // Standardvärden för reset
+  const DEFAULTS = {
+    'in-rante-risk': '2', 'in-amor-risk': '1',
+    'in-kommunsats': '29.83', 'in-kyrko-sats': '1.02',
+    'in-kyrka': false,
+    'sl-pris': '2500000', 'sl-ki': '15', 'sl-ranta': '4.5',
+    'sl-amor': '2', 'sl-hyra': '0', 'sl-veckor': '0',
+  };
+
+  function resetData() {
+    if (!confirm('Rensa alla inmatade värden och börja om från noll?')) return;
+    SAVE_FIELDS.forEach(([id, type]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (type === 'checkbox') el.checked = DEFAULTS[id] ?? false;
+      else el.value = DEFAULTS[id] ?? '0';
+    });
+    // Återställ till Stockholm som neutral kommundefault
+    const sel = document.getElementById('in-kommun');
+    if (sel) { sel.value = 'Stockholm'; onKommunChange(); }
+    onKyrkaChange();
+    recalcNetto();
+  }
+
+  document.querySelectorAll('input[type=range]').forEach(el => el.addEventListener('input', update));
+  buildKommunDropdown();
+  recalcNetto();
+</script>
+
+</body>
+</html>
