@@ -888,230 +888,1069 @@
   .tab-btn .tab-icon { font-size: 18px; line-height: 1; }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
+
+  /* ── Wizard ──────────────────────────────────────────── */
+  /* ── Header-knappar ─────────────────────────────────────── */
+  .header-actions {
+    position: absolute;
+    top: 28px;
+    right: 40px;
+    display: flex;
+    gap: 8px;
+    z-index: 2;
+  }
+  .hdr-btn {
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    color: var(--birch);
+    padding: 9px 18px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .hdr-btn:hover { background: rgba(255,255,255,0.22); }
+  .hdr-btn--data { }
+  .hdr-btn--wizard {
+    background: rgba(196,135,42,0.22);
+    border-color: rgba(196,135,42,0.4);
+  }
+  .hdr-btn--wizard:hover { background: rgba(196,135,42,0.38); }
+
+  /* ── Data-drawer ─────────────────────────────────────────── */
+  #data-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,36,20,0.35);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 800;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  #data-drawer-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #data-drawer {
+    position: fixed;
+    top: 0; right: 0;
+    width: 440px;
+    max-width: 100vw;
+    height: 100vh;
+    background: var(--cream);
+    z-index: 810;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    box-shadow: -6px 0 48px rgba(0,0,0,0.18);
+    display: flex;
+    flex-direction: column;
+  }
+  #data-drawer.open { transform: translateX(0); }
+
+  .drawer-hdr {
+    padding: 22px 24px 16px;
+    border-bottom: 1px solid var(--mist);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: var(--cream);
+    z-index: 2;
+  }
+  .drawer-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--forest);
+  }
+  .drawer-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--grey);
+    padding: 5px 8px;
+    border-radius: 8px;
+    line-height: 1;
+    transition: all 0.15s;
+  }
+  .drawer-close:hover { background: var(--mist); color: var(--forest); }
+
+  .drawer-body { padding: 20px 24px 40px; flex: 1; }
+  .drawer-body .section-label { margin-top: 0; }
+  .drawer-body .settings-section { border: none; padding: 0; background: none; }
+
+  #wizard-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20,36,20,0.65);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  #wizard-overlay.wiz-hidden { display: none; }
+
+  #wizard-panel {
+    background: var(--cream);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 580px;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 28px 90px rgba(0,0,0,0.35);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wiz-header {
+    padding: 22px 28px 14px;
+    border-bottom: 1px solid var(--mist);
+    position: sticky;
+    top: 0;
+    background: var(--cream);
+    border-radius: 20px 20px 0 0;
+    z-index: 2;
+  }
+  .wiz-progress {
+    height: 4px;
+    background: var(--mist);
+    border-radius: 2px;
+    margin-bottom: 12px;
+  }
+  .wiz-progress-fill {
+    height: 100%;
+    background: var(--sage);
+    border-radius: 2px;
+    transition: width 0.35s ease;
+  }
+  .wiz-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .wiz-step-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--grey);
+  }
+  .wiz-exit-btn {
+    font-size: 12px;
+    color: var(--grey);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: underline;
+    padding: 2px 0;
+  }
+  .wiz-exit-btn:hover { color: var(--forest); }
+
+  .wiz-body { padding: 26px 28px 8px; flex: 1; }
+
+  .wiz-step { display: none; }
+  .wiz-step.wiz-active { display: block; }
+
+  .wiz-step-icon { font-size: 30px; margin-bottom: 8px; }
+  .wiz-step h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    color: var(--forest);
+    margin-bottom: 6px;
+  }
+  .wiz-sub {
+    font-size: 13px;
+    color: var(--grey);
+    margin-bottom: 22px;
+    line-height: 1.55;
+  }
+
+  .wiz-person-card {
+    background: white;
+    border: 1.5px solid var(--mist);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .wiz-person-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--sage);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+  .wiz-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .wiz-3col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  .wiz-field { margin-bottom: 14px; }
+  .wiz-field:last-child { margin-bottom: 0; }
+  .wiz-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--grey);
+    margin-bottom: 5px;
+  }
+  .wiz-field input[type=text],
+  .wiz-field input[type=number] {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1.5px solid var(--mist);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    background: white;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .wiz-field input:focus { border-color: var(--sage); }
+  .wiz-hint {
+    font-size: 11px;
+    color: var(--grey);
+    margin-top: 5px;
+    line-height: 1.4;
+  }
+  .wiz-costs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .wiz-type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .wiz-type-card {
+    border: 2px solid var(--mist);
+    border-radius: 14px;
+    padding: 16px 8px 14px;
+    text-align: center;
+    cursor: pointer;
+    background: white;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .wiz-type-card:hover { border-color: var(--fern); background: #f5faf0; }
+  .wiz-type-card.wiz-selected { border-color: var(--sage); background: #e8f3e0; }
+  .wiz-type-icon { font-size: 28px; margin-bottom: 6px; }
+  .wiz-type-label { font-size: 14px; font-weight: 600; color: var(--forest); }
+  .wiz-type-desc { font-size: 11px; color: var(--grey); margin-top: 2px; }
+
+  .wiz-loan-item {
+    background: white;
+    border: 1.5px solid var(--mist);
+    border-radius: 12px;
+    padding: 14px 14px 10px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .wiz-loan-remove {
+    position: absolute;
+    top: 10px; right: 12px;
+    background: none; border: none;
+    font-size: 15px; cursor: pointer;
+    color: var(--grey); line-height: 1;
+    padding: 2px 4px;
+  }
+  .wiz-loan-remove:hover { color: var(--red); }
+  .wiz-loan-name {
+    font-size: 12px; font-weight: 600;
+    color: var(--forest);
+    margin-bottom: 10px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .wiz-add-loan-btn {
+    width: 100%;
+    padding: 9px;
+    border: 1.5px dashed var(--mist);
+    border-radius: 10px;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--grey);
+    cursor: pointer;
+    margin-top: 4px;
+    transition: all 0.15s;
+  }
+  .wiz-add-loan-btn:hover { border-color: var(--sage); color: var(--sage); }
+
+  .wiz-divider {
+    border: none;
+    border-top: 1px solid var(--mist);
+    margin: 20px 0;
+  }
+
+  .wiz-footer {
+    padding: 18px 28px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--mist);
+    position: sticky;
+    bottom: 0;
+    background: var(--cream);
+    border-radius: 0 0 20px 20px;
+  }
+  .wiz-btn {
+    padding: 11px 26px;
+    border-radius: 50px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .wiz-btn.wiz-primary { background: var(--forest); color: var(--birch); }
+  .wiz-btn.wiz-primary:hover { background: var(--moss); }
+  .wiz-btn.wiz-secondary { background: var(--mist); color: var(--forest); }
+  .wiz-btn.wiz-secondary:hover { background: #b8c9a8; }
+  .wiz-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .wiz-btn:disabled:hover { background: var(--mist); }
+
+  .wiz-add-p2-btn {
+    width: 100%;
+    padding: 11px;
+    margin-top: 4px;
+    border: 1.5px dashed var(--mist);
+    border-radius: 12px;
+    background: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--grey);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .wiz-add-p2-btn:hover { border-color: var(--sage); color: var(--sage); background: #f5faf0; }
+
+  .wiz-remove-p2-btn {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: var(--grey);
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+  .wiz-remove-p2-btn:hover { color: var(--red); background: #fdecea; }
+
+  /* ── Analyserar-skärm ───────────────────────────────────── */
+  #wiz-analyzing {
+    display: none;
+    background: linear-gradient(145deg, var(--moss) 0%, var(--forest) 100%);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 580px;
+    min-height: 340px;
+    box-shadow: 0 28px 90px rgba(0,0,0,0.35);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 40px;
+    gap: 0;
+  }
+  #wiz-analyzing.wiz-visible { display: flex; }
+
+  .wiz-analyze-icon {
+    font-size: 40px;
+    margin-bottom: 28px;
+    animation: wiz-icon-pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes wiz-icon-pulse {
+    0%, 100% { transform: scale(1);    opacity: 0.9; }
+    50%       { transform: scale(1.12); opacity: 1;   }
+  }
+  .wiz-analyze-dots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .wiz-analyze-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--amber-light);
+    animation: wiz-dot-bounce 1.1s ease-in-out infinite;
+  }
+  .wiz-analyze-dot:nth-child(2) { animation-delay: 0.18s; }
+  .wiz-analyze-dot:nth-child(3) { animation-delay: 0.36s; }
+  @keyframes wiz-dot-bounce {
+    0%, 80%, 100% { transform: translateY(0);    opacity: 0.35; }
+    40%            { transform: translateY(-9px); opacity: 1;    }
+  }
+  .wiz-analyze-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--mist);
+    min-height: 18px;
+    transition: opacity 0.3s;
+  }
+
+  /* ── Sammanfattnings-modal ──────────────────────────────── */
+  #wiz-summary {
+    display: none;
+    background: var(--cream);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 580px;
+    max-height: 92vh;
+    overflow-y: auto;
+    box-shadow: 0 28px 90px rgba(0,0,0,0.35);
+    flex-direction: column;
+  }
+  #wiz-summary.wiz-visible {
+    display: flex;
+    animation: wiz-sum-reveal 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes wiz-sum-reveal {
+    from { opacity: 0; transform: scale(0.94) translateY(12px); }
+    to   { opacity: 1; transform: scale(1)    translateY(0);    }
+  }
+
+  .wiz-sum-header {
+    padding: 30px 28px 26px;
+    border-radius: 20px 20px 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .wiz-sum-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+  }
+  .wiz-sum-header.feasible { background: linear-gradient(135deg, #2d4a2d, #1a2e1a); }
+  .wiz-sum-header.caution  { background: linear-gradient(135deg, #8b5e14, #5c3d0a); }
+  .wiz-sum-header.risky    { background: linear-gradient(135deg, #7a2018, #4a1010); }
+
+  .wiz-sum-tab-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .wiz-sum-tab-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+  .wiz-sum-verdict {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .wiz-sum-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.55;
+    position: relative;
+  }
+
+  .wiz-sum-body { padding: 22px 28px 4px; }
+
+  .wiz-sum-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .wiz-sum-metric {
+    background: white;
+    border: 1.5px solid var(--mist);
+    border-radius: 12px;
+    padding: 13px 15px;
+  }
+  .wiz-sum-metric-lbl {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--grey);
+    margin-bottom: 5px;
+  }
+  .wiz-sum-metric-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 19px;
+    font-weight: 500;
+    color: var(--forest);
+  }
+  .wiz-sum-metric-val.green  { color: var(--sage); }
+  .wiz-sum-metric-val.amber  { color: var(--amber); }
+  .wiz-sum-metric-val.red    { color: var(--red); }
+
+  .wiz-sum-warns { margin-bottom: 4px; }
+  .wiz-sum-warns .warn-pill { margin-bottom: 6px; }
+
+  .wiz-sum-footer {
+    padding: 16px 28px 26px;
+  }
+  .wiz-sum-cta {
+    width: 100%;
+    padding: 14px;
+    background: var(--forest);
+    color: var(--birch);
+    border: none;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .wiz-sum-cta:hover { background: var(--moss); }
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- WIZARD OVERLAY                                                           -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div id="wizard-overlay" onclick="wizardExit()">
+<div id="wizard-panel" onclick="event.stopPropagation()">
+
+  <!-- Header: progress + exit -->
+  <div class="wiz-header">
+    <div class="wiz-progress">
+      <div class="wiz-progress-fill" id="wiz-progress-fill" style="width:20%"></div>
+    </div>
+    <div class="wiz-meta">
+      <span class="wiz-step-label" id="wiz-step-label">Steg 1 av 5</span>
+      <button class="wiz-exit-btn" onclick="wizardExit()">Hoppa ur till fullständig vy →</button>
+    </div>
+  </div>
+
+  <!-- Body: steps -->
+  <div class="wiz-body">
+
+    <!-- ── Steg 1: Inkomster ─────────────────────────────────────────── -->
+    <div class="wiz-step wiz-active" id="wiz-step-1">
+      <div class="wiz-step-icon">💼</div>
+      <h2>Era inkomster</h2>
+      <p class="wiz-sub">Fyll i era månadslöner — vi beräknar nettolön automatiskt utifrån kommunalskatt.</p>
+
+      <div class="wiz-person-card">
+        <div class="wiz-person-title">Person 1</div>
+        <div class="wiz-2col">
+          <div class="wiz-field">
+            <label>Namn</label>
+            <input type="text" id="wiz-p1-namn" placeholder="t.ex. Anna"
+              oninput="syncMainEl('in-p1-namn', this.value); updatePersonLabels()">
+          </div>
+          <div class="wiz-field">
+            <label>Bruttolön / mån (kr)</label>
+            <input type="number" id="wiz-p1-brutto" placeholder="65 000" step="1000"
+              oninput="syncMainEl('in-p1-brutto', this.value); recalcNetto()">
+          </div>
+        </div>
+      </div>
+
+      <div class="wiz-person-card" id="wiz-p2-card" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span class="wiz-person-title" style="margin-bottom:0">Person 2</span>
+          <button class="wiz-remove-p2-btn" onclick="wizRemoveP2()" title="Ta bort">✕ Ta bort</button>
+        </div>
+        <div class="wiz-2col">
+          <div class="wiz-field">
+            <label>Namn</label>
+            <input type="text" id="wiz-p2-namn" placeholder="t.ex. Erik"
+              oninput="syncMainEl('in-p2-namn', this.value); updatePersonLabels()">
+          </div>
+          <div class="wiz-field">
+            <label>Bruttolön / mån (kr)</label>
+            <input type="number" id="wiz-p2-brutto" placeholder="60 000" step="1000"
+              oninput="syncMainEl('in-p2-brutto', this.value); recalcNetto()">
+          </div>
+        </div>
+      </div>
+
+      <button class="wiz-add-p2-btn" id="wiz-add-p2-btn" onclick="wizAddP2()">＋ Lägg till person 2</button>
+    </div>
+
+    <!-- ── Steg 2: Fasta kostnader ───────────────────────────────────── -->
+    <div class="wiz-step" id="wiz-step-2">
+      <div class="wiz-step-icon">🧾</div>
+      <h2>Fasta månadsutgifter</h2>
+      <p class="wiz-sub">Uppskatta era återkommande levnadskostnader, exklusive boende och lån.</p>
+
+      <div class="wiz-costs-grid">
+        <div class="wiz-field">
+          <label>El & värme (kr/mån)</label>
+          <input type="number" id="wiz-el" step="100" placeholder="1 500"
+            oninput="syncMainEl('in-el', this.value); update()">
+        </div>
+        <div class="wiz-field">
+          <label>Hemförsäkring (kr/mån)</label>
+          <input type="number" id="wiz-forsak" step="50" placeholder="300"
+            oninput="syncMainEl('in-forsak', this.value); update()">
+        </div>
+        <div class="wiz-field">
+          <label>Telefon & bredband</label>
+          <input type="number" id="wiz-tel" step="50" placeholder="500"
+            oninput="syncMainEl('in-tel', this.value); update()">
+        </div>
+        <div class="wiz-field">
+          <label>Streaming & prenumerationer</label>
+          <input type="number" id="wiz-stream" step="50" placeholder="400"
+            oninput="syncMainEl('in-stream', this.value); update()">
+        </div>
+        <div class="wiz-field">
+          <label>Förskola / barnomsorg</label>
+          <input type="number" id="wiz-forskola" step="100" placeholder="0"
+            oninput="syncMainEl('in-forskola', this.value); update()">
+        </div>
+        <div class="wiz-field">
+          <label>Mat & levnad (kr/mån)</label>
+          <input type="number" id="wiz-levnad" step="500" placeholder="15 000"
+            oninput="syncMainEl('in-levnad', this.value); update()">
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Steg 3: Sparande & kapital ───────────────────────────────── -->
+    <div class="wiz-step" id="wiz-step-3">
+      <div class="wiz-step-icon">🏦</div>
+      <h2>Sparande & kapital</h2>
+      <p class="wiz-sub">Hur mycket sparar ni varje månad, och hur mycket har ni tillgängligt som kontantinsats?</p>
+
+      <div class="wiz-2col">
+        <div class="wiz-field">
+          <label>Månadssparande — fonder (kr)</label>
+          <input type="number" id="wiz-spar-fonder" step="500" placeholder="5 000"
+            oninput="syncMainEl('in-spar-fonder', this.value); update()">
+        </div>
+        <div class="wiz-field">
+          <label>Månadssparande — semester (kr)</label>
+          <input type="number" id="wiz-spar-semester" step="200" placeholder="2 000"
+            oninput="syncMainEl('in-spar-semester', this.value); update()">
+        </div>
+      </div>
+      <hr class="wiz-divider">
+      <div class="wiz-field">
+        <label>Tillgängligt kapital för kontantinsats (kr)</label>
+        <input type="number" id="wiz-kapital" step="50000" placeholder="800 000"
+          oninput="syncMainEl('in-kapital', this.value); update()">
+        <div class="wiz-hint">Minst 15 % av köpeskillingen krävs som kontantinsats.</div>
+      </div>
+    </div>
+
+    <!-- ── Steg 4: Befintliga lån ─────────────────────────────────────── -->
+    <div class="wiz-step" id="wiz-step-4">
+      <div class="wiz-step-icon">📋</div>
+      <h2>Befintliga lån</h2>
+      <p class="wiz-sub">Lägg till lån ni redan har — bolån, billån, blancolån osv. Lämna blankt om ni inte har några.</p>
+
+      <div id="wiz-loans-list"></div>
+      <button class="wiz-add-loan-btn" onclick="wizAddLoan()">＋ Lägg till lån</button>
+
+      <hr class="wiz-divider">
+      <div class="wiz-field">
+        <label>Nuvarande månadsavgift / hyra (kr)</label>
+        <input type="number" id="wiz-brf-avgift" step="100" placeholder="4 000"
+          oninput="syncMainEl('in-brf-avgift', this.value); update()">
+        <div class="wiz-hint">Avgift till BRF eller hyra på nuvarande boende — inte lån.</div>
+      </div>
+    </div>
+
+    <!-- ── Steg 5: Objektet ──────────────────────────────────────────── -->
+    <div class="wiz-step" id="wiz-step-5">
+      <div class="wiz-step-icon">🔑</div>
+      <h2>Vad vill ni köpa?</h2>
+      <p class="wiz-sub">Välj typ av boende och ange ett ungefärligt pris att utgå från.</p>
+
+      <div class="wiz-type-grid">
+        <div class="wiz-type-card" id="wiz-type-brf" onclick="wizSelectType('brf')">
+          <div class="wiz-type-icon">🏢</div>
+          <div class="wiz-type-label">BRF</div>
+          <div class="wiz-type-desc">Bostadsrätt</div>
+        </div>
+        <div class="wiz-type-card" id="wiz-type-hus" onclick="wizSelectType('hus')">
+          <div class="wiz-type-icon">🏡</div>
+          <div class="wiz-type-label">Hus</div>
+          <div class="wiz-type-desc">Villa / radhus</div>
+        </div>
+        <div class="wiz-type-card" id="wiz-type-fritidshus" onclick="wizSelectType('fritidshus')">
+          <div class="wiz-type-icon">🌲</div>
+          <div class="wiz-type-label">Fritidshus</div>
+          <div class="wiz-type-desc">Sommarstuga</div>
+        </div>
+      </div>
+
+      <div class="wiz-2col">
+        <div class="wiz-field">
+          <label>Pris (kr)</label>
+          <input type="number" id="wiz-pris" step="100000" placeholder="3 500 000"
+            oninput="wizSyncObjSlider('pris', this.value)">
+        </div>
+        <div class="wiz-field">
+          <label>Kontantinsats (%)</label>
+          <input type="number" id="wiz-ki" step="1" min="10" max="50" placeholder="15"
+            oninput="wizSyncObjSlider('ki', this.value)">
+        </div>
+        <div class="wiz-field">
+          <label>Ränta (%)</label>
+          <input type="number" id="wiz-ranta" step="0.1" min="0" max="10" placeholder="4.5"
+            oninput="wizSyncObjSlider('ranta', this.value)">
+        </div>
+        <div class="wiz-field">
+          <label>Amortering (%/år)</label>
+          <input type="number" id="wiz-amor" step="0.5" min="0" max="5" placeholder="2.0"
+            oninput="wizSyncObjSlider('amor', this.value)">
+        </div>
+      </div>
+
+      <!-- BRF-specifikt -->
+      <div id="wiz-obj-brf" style="display:none">
+        <div class="wiz-field">
+          <label>Månadsavgift BRF (kr/mån)</label>
+          <input type="number" id="wiz-avgift" step="100" placeholder="4 000"
+            oninput="syncSliderEl('brf-sl-avgift', this.value); update()">
+        </div>
+      </div>
+
+      <!-- Hus-specifikt -->
+      <div id="wiz-obj-hus" style="display:none">
+        <div class="wiz-field">
+          <label>Driftkostnad / mån (kr)</label>
+          <input type="number" id="wiz-drift" step="200" placeholder="3 000"
+            oninput="syncSliderEl('hus-sl-drift', this.value); update()">
+        </div>
+      </div>
+
+      <!-- Fritidshus-specifikt -->
+      <div id="wiz-obj-fritids" style="display:none">
+        <div class="wiz-2col">
+          <div class="wiz-field">
+            <label>Uthyrningspris / natt (kr)</label>
+            <input type="number" id="wiz-hyra" step="100" placeholder="0"
+              oninput="syncSliderEl('sl-hyra', this.value); update()">
+          </div>
+          <div class="wiz-field">
+            <label>Uthyrningsveckor / år</label>
+            <input type="number" id="wiz-veckor" step="1" min="0" max="30" placeholder="0"
+              oninput="syncSliderEl('sl-veckor', this.value); update()">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .wiz-body -->
+
+  <!-- Footer: nav buttons -->
+  <div class="wiz-footer">
+    <button class="wiz-btn wiz-secondary" id="wiz-back-btn" onclick="wizardPrev()" disabled>← Tillbaka</button>
+    <button class="wiz-btn wiz-primary"   id="wiz-next-btn" onclick="wizardNext()">Nästa →</button>
+  </div>
+
+</div><!-- #wizard-panel -->
+
+<!-- Analyserar-skärm -->
+<div id="wiz-analyzing" onclick="event.stopPropagation()">
+  <div class="wiz-analyze-icon">🔍</div>
+  <div class="wiz-analyze-dots">
+    <div class="wiz-analyze-dot"></div>
+    <div class="wiz-analyze-dot"></div>
+    <div class="wiz-analyze-dot"></div>
+  </div>
+  <div class="wiz-analyze-label" id="wiz-analyze-label">Analyserar</div>
+</div>
+
+<!-- Sammanfattnings-modal -->
+<div id="wiz-summary" onclick="event.stopPropagation()">
+  <div class="wiz-sum-header feasible" id="wiz-sum-header">
+    <div class="wiz-sum-tab-row">
+      <span class="wiz-sum-tab-badge" id="wiz-sum-badge">BRF</span>
+    </div>
+    <div class="wiz-sum-verdict" id="wiz-sum-verdict">—</div>
+    <div class="wiz-sum-sub"    id="wiz-sum-sub">—</div>
+  </div>
+
+  <div class="wiz-sum-body">
+    <div class="wiz-sum-grid">
+      <div class="wiz-sum-metric">
+        <div class="wiz-sum-metric-lbl">Lånekostnad</div>
+        <div class="wiz-sum-metric-val" id="wiz-sum-lank">—</div>
+      </div>
+      <div class="wiz-sum-metric">
+        <div class="wiz-sum-metric-lbl">Kvar / mån</div>
+        <div class="wiz-sum-metric-val" id="wiz-sum-kvar">—</div>
+      </div>
+      <div class="wiz-sum-metric">
+        <div class="wiz-sum-metric-lbl">Total skuld</div>
+        <div class="wiz-sum-metric-val" id="wiz-sum-skuld">—</div>
+      </div>
+      <div class="wiz-sum-metric">
+        <div class="wiz-sum-metric-lbl">Skuld / inkomst</div>
+        <div class="wiz-sum-metric-val" id="wiz-sum-ratio">—</div>
+      </div>
+    </div>
+    <div class="wiz-sum-warns" id="wiz-sum-warns"></div>
+  </div>
+
+  <div class="wiz-sum-footer">
+    <button class="wiz-sum-cta" onclick="wizardExit()">Se fullständig kalkyl →</button>
+  </div>
+</div>
+
+</div><!-- #wizard-overlay -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!-- DATA DRAWER                                                              -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<div id="data-drawer-backdrop" onclick="closeDataDrawer()"></div>
+<div id="data-drawer">
+  <div class="drawer-hdr">
+    <span class="drawer-title">Din data</span>
+    <button class="drawer-close" onclick="closeDataDrawer()" title="Stäng">✕</button>
+  </div>
+  <div class="drawer-body">
+
+    <!-- Spara / ladda -->
+    <div class="data-bar" style="margin-bottom:24px">
+      <button class="data-btn save" onclick="saveData()">⬇ Spara data</button>
+      <div class="drop-zone" id="drop-zone"
+           onclick="document.getElementById('file-input-hidden').click()"
+           ondragover="onDragOver(event)"
+           ondragleave="onDragLeave(event)"
+           ondrop="onDrop(event)">
+        <span class="drop-icon">⬆</span>
+        Släpp JSON-fil här eller klicka för att ladda
+      </div>
+      <input type="file" id="file-input-hidden" accept=".json" onchange="loadData(event)">
+      <button class="data-btn reset" onclick="resetData()">✕ Rensa allt</button>
+      <span class="data-saved-msg" id="saved-msg">✓ Sparad!</span>
+    </div>
+
+    <!-- Er ekonomi -->
+    <div class="section-label">Er ekonomi</div>
+    <div class="settings-section">
+
+      <div class="settings-group">
+        <div class="settings-group-label">Skatteberäkning</div>
+        <div class="input-grid">
+          <div class="input-item">
+            <label>Kommun</label>
+            <select id="in-kommun" onchange="onKommunChange()"></select>
+            <span class="input-hint">Påverkar kommunalskatt + landsting</span>
+          </div>
+          <div class="input-item">
+            <label>Anpassad kommunalskatt (%)</label>
+            <input type="number" id="in-kommunsats" value="29.70" step="0.01" oninput="recalcNetto()">
+            <span class="input-hint">Ändras automatiskt vid kommunval</span>
+          </div>
+          <div class="input-item" style="display:flex;flex-direction:column;justify-content:center">
+            <label>Svenska kyrkan</label>
+            <div class="kyrko-row">
+              <input type="checkbox" id="in-kyrka" onchange="onKyrkaChange()">
+              <label for="in-kyrka">Medlem i Svenska kyrkan</label>
+            </div>
+            <div class="kyrko-rate-wrap" id="kyrko-rate-wrap">
+              <input type="number" id="in-kyrko-sats" value="1.02" step="0.01" oninput="recalcNetto()">
+              <span>% kyrkoavgift</span>
+            </div>
+            <span class="input-hint">Kyrkoavgiften varierar per församling</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-label">Inkomster</div>
+        <div class="person-cards">
+
+          <!-- ── Person 1 ── -->
+          <div class="person-card person-card--1">
+            <div class="person-card-header">
+              <span class="person-card-num">1</span>
+              <input type="text" class="person-name-input" id="in-p1-namn" value="" placeholder="Person 1" oninput="updatePersonLabels()">
+            </div>
+            <div class="input-item">
+              <label>Bruttolön/mån</label>
+              <input type="number" id="in-p1-brutto" value="0" step="1000" oninput="recalcNetto()">
+              <div class="netto-computed" id="p1-netto-display">
+                <span>→ Netto:</span>
+                <span class="netto-val" id="p1-netto-val">—</span>
+                <span class="netto-tag">Beräknat</span>
+              </div>
+            </div>
+            <div class="input-item">
+              <label>Netto/mån <span style="font-size:10px;color:#aaa">(override)</span></label>
+              <input type="number" id="in-p1-netto" value="" step="500" oninput="onNettoOverride('p1')" placeholder="Lämna tomt för auto">
+              <span class="input-hint">Fyll i om du vill styra nettot manuellt</span>
+            </div>
+            <div class="input-item">
+              <label>Bonus netto/år</label>
+              <input type="number" id="in-p1-bonus" value="0" step="10000" oninput="update()">
+              <span class="input-hint">0 om ingen bonus</span>
+            </div>
+          </div>
+
+          <!-- ── Person 2 ── -->
+          <div class="person-card person-card--2">
+            <div class="person-card-header">
+              <span class="person-card-num">2</span>
+              <input type="text" class="person-name-input" id="in-p2-namn" value="" placeholder="Person 2" oninput="updatePersonLabels()">
+            </div>
+            <div class="input-item">
+              <label>Bruttolön/mån</label>
+              <input type="number" id="in-p2-brutto" value="0" step="1000" oninput="recalcNetto()">
+              <div class="netto-computed" id="p2-netto-display">
+                <span>→ Netto:</span>
+                <span class="netto-val" id="p2-netto-val">—</span>
+                <span class="netto-tag">Beräknat</span>
+              </div>
+            </div>
+            <div class="input-item">
+              <label>Netto/mån <span style="font-size:10px;color:#aaa">(override)</span></label>
+              <input type="number" id="in-p2-netto" value="" step="500" oninput="onNettoOverride('p2')" placeholder="Lämna tomt för auto">
+              <span class="input-hint">Fyll i om du vill styra nettot manuellt</span>
+            </div>
+            <div class="input-item">
+              <label>Bonus netto/år</label>
+              <input type="number" id="in-p2-bonus" value="0" step="10000" oninput="update()">
+              <span class="input-hint">0 om ingen bonus</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-label">Befintliga lån &amp; boende</div>
+        <div id="loans-list" class="loans-list"></div>
+        <button class="loan-add-btn" onclick="addLoan()">＋ Lägg till lån</button>
+        <div class="loan-total-row" id="loan-total-row" style="display:none">
+          Totalt per mån: <strong id="loan-total-text">—</strong>
+        </div>
+        <div class="input-grid" style="margin-top:14px">
+          <div class="input-item">
+            <label>Månadsavgift / hyra (kr)</label>
+            <input type="number" id="in-brf-avgift" value="0" step="100" oninput="update()">
+            <span class="input-hint">BRF-avgift, hyra eller 0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-label">Övriga fasta kostnader per månad</div>
+        <div class="input-grid">
+          <div class="input-item">
+            <label>El &amp; uppvärmning</label>
+            <input type="number" id="in-el" value="0" step="100" oninput="update()">
+          </div>
+          <div class="input-item">
+            <label>Försäkring</label>
+            <input type="number" id="in-forsak" value="0" step="50" oninput="update()">
+          </div>
+          <div class="input-item">
+            <label>Telefoni</label>
+            <input type="number" id="in-tel" value="0" step="50" oninput="update()">
+          </div>
+          <div class="input-item">
+            <label>Streaming &amp; abonnemang</label>
+            <input type="number" id="in-stream" value="0" step="50" oninput="update()">
+          </div>
+          <div class="input-item">
+            <label>Förskola / barnomsorg</label>
+            <input type="number" id="in-forskola" value="0" step="100" oninput="update()">
+            <span class="input-hint">0 om ej aktuellt</span>
+          </div>
+          <div class="input-item">
+            <label>Mat, transport &amp; övrigt</label>
+            <input type="number" id="in-levnad" value="0" step="500" oninput="update()">
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-label">Tillgångar &amp; sparande</div>
+        <div class="input-grid">
+          <div class="input-item">
+            <label>Tillgängligt kapital (fonder/sparkonto)</label>
+            <input type="number" id="in-kapital" value="0" step="50000" oninput="update()">
+            <span class="input-hint">Används för kontantinsats &amp; buffert</span>
+          </div>
+          <div class="input-item">
+            <label>Månadssparande fonder (kr/mån)</label>
+            <input type="number" id="in-spar-fonder" value="0" step="1000" oninput="update()">
+            <span class="input-hint">Omfördelningsbart vid behov</span>
+          </div>
+          <div class="input-item">
+            <label>Semesterkonto (kr/mån)</label>
+            <input type="number" id="in-spar-semester" value="0" step="500" oninput="update()">
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-label">Riskscenarier</div>
+        <div class="input-grid">
+          <div class="input-item">
+            <label>Ränteuppgång befintligt lån (procentenheter)</label>
+            <input type="number" id="in-rante-risk" value="2" step="0.5" oninput="update()">
+            <span class="input-hint">Simuleras i scenariotabellen</span>
+          </div>
+          <div class="input-item">
+            <label>Ev. amorteringskrav befintligt lån (% av lån/år)</label>
+            <input type="number" id="in-amor-risk" value="1" step="0.5" oninput="update()">
+            <span class="input-hint">Om amorteringskrav tillkommer framöver</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .settings-section -->
+  </div><!-- .drawer-body -->
+</div><!-- #data-drawer -->
 
 <header>
   <div class="subtitle">Ekonomikalkyl · Boende &amp; Fritidshus</div>
   <h1>Vad har ni råd med<br>att <span>köpa?</span></h1>
   <p class="intro">Fyll i er ekonomiska situation och välj sedan BRF, Hus eller Fritidshus — kalkylen visar vad ni kan köpa med scenarier för trygghet, försiktighet och maximal exponering.</p>
+  <div class="header-actions">
+    <button class="hdr-btn hdr-btn--data"   onclick="openDataDrawer()">☰ Din data</button>
+    <button class="hdr-btn hdr-btn--wizard" onclick="wizardOpen()">✦ Guidad inmatning</button>
+  </div>
 </header>
 
 <div class="main">
 
-  <!-- SPARA / LADDA -->
-  <div class="divider"></div>
-  <div class="data-bar">
-    <span class="data-bar-label">Din data</span>
-    <button class="data-btn save" onclick="saveData()">⬇ Spara data</button>
-    <div class="drop-zone" id="drop-zone"
-         onclick="document.getElementById('file-input-hidden').click()"
-         ondragover="onDragOver(event)"
-         ondragleave="onDragLeave(event)"
-         ondrop="onDrop(event)">
-      <span class="drop-icon">⬆</span>
-      Släpp JSON-fil här eller klicka för att ladda
-    </div>
-    <input type="file" id="file-input-hidden" accept=".json" onchange="loadData(event)">
-    <button class="data-btn reset" onclick="resetData()">✕ Rensa allt</button>
-    <span class="data-saved-msg" id="saved-msg">✓ Sparad!</span>
-  </div>
-
-  <!-- ER EKONOMI -->
-  <div class="section-label">Er ekonomi</div>
-
-  <div class="settings-section">
-
-    <div class="settings-group">
-      <div class="settings-group-label">Skatteberäkning</div>
-      <div class="input-grid">
-        <div class="input-item">
-          <label>Kommun</label>
-          <select id="in-kommun" onchange="onKommunChange()"></select>
-          <span class="input-hint">Påverkar kommunalskatt + landsting</span>
-        </div>
-        <div class="input-item">
-          <label>Anpassad kommunalskatt (%)</label>
-          <input type="number" id="in-kommunsats" value="29.70" step="0.01" oninput="recalcNetto()">
-          <span class="input-hint">Ändras automatiskt vid kommunval</span>
-        </div>
-        <div class="input-item" style="display:flex;flex-direction:column;justify-content:center">
-          <label>Svenska kyrkan</label>
-          <div class="kyrko-row">
-            <input type="checkbox" id="in-kyrka" onchange="onKyrkaChange()">
-            <label for="in-kyrka">Medlem i Svenska kyrkan</label>
-          </div>
-          <div class="kyrko-rate-wrap" id="kyrko-rate-wrap">
-            <input type="number" id="in-kyrko-sats" value="1.02" step="0.01" oninput="recalcNetto()">
-            <span>% kyrkoavgift</span>
-          </div>
-          <span class="input-hint">Kyrkoavgiften varierar per församling</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-group">
-      <div class="settings-group-label">Inkomster</div>
-      <div class="person-cards">
-
-        <!-- ── Person 1 ── -->
-        <div class="person-card person-card--1">
-          <div class="person-card-header">
-            <span class="person-card-num">1</span>
-            <input type="text" class="person-name-input" id="in-p1-namn" value="" placeholder="Person 1" oninput="updatePersonLabels()">
-          </div>
-          <div class="input-item">
-            <label>Bruttolön/mån</label>
-            <input type="number" id="in-p1-brutto" value="0" step="1000" oninput="recalcNetto()">
-            <div class="netto-computed" id="p1-netto-display">
-              <span>→ Netto:</span>
-              <span class="netto-val" id="p1-netto-val">—</span>
-              <span class="netto-tag">Beräknat</span>
-            </div>
-          </div>
-          <div class="input-item">
-            <label>Netto/mån <span style="font-size:10px;color:#aaa">(override)</span></label>
-            <input type="number" id="in-p1-netto" value="" step="500" oninput="onNettoOverride('p1')" placeholder="Lämna tomt för auto">
-            <span class="input-hint">Fyll i om du vill styra nettot manuellt</span>
-          </div>
-          <div class="input-item">
-            <label>Bonus netto/år</label>
-            <input type="number" id="in-p1-bonus" value="0" step="10000" oninput="update()">
-            <span class="input-hint">0 om ingen bonus</span>
-          </div>
-        </div>
-
-        <!-- ── Person 2 ── -->
-        <div class="person-card person-card--2">
-          <div class="person-card-header">
-            <span class="person-card-num">2</span>
-            <input type="text" class="person-name-input" id="in-p2-namn" value="" placeholder="Person 2" oninput="updatePersonLabels()">
-          </div>
-          <div class="input-item">
-            <label>Bruttolön/mån</label>
-            <input type="number" id="in-p2-brutto" value="0" step="1000" oninput="recalcNetto()">
-            <div class="netto-computed" id="p2-netto-display">
-              <span>→ Netto:</span>
-              <span class="netto-val" id="p2-netto-val">—</span>
-              <span class="netto-tag">Beräknat</span>
-            </div>
-          </div>
-          <div class="input-item">
-            <label>Netto/mån <span style="font-size:10px;color:#aaa">(override)</span></label>
-            <input type="number" id="in-p2-netto" value="" step="500" oninput="onNettoOverride('p2')" placeholder="Lämna tomt för auto">
-            <span class="input-hint">Fyll i om du vill styra nettot manuellt</span>
-          </div>
-          <div class="input-item">
-            <label>Bonus netto/år</label>
-            <input type="number" id="in-p2-bonus" value="0" step="10000" oninput="update()">
-            <span class="input-hint">0 om ingen bonus</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="settings-group">
-      <div class="settings-group-label">Befintliga lån &amp; boende</div>
-      <div id="loans-list" class="loans-list"></div>
-      <button class="loan-add-btn" onclick="addLoan()">＋ Lägg till lån</button>
-      <div class="loan-total-row" id="loan-total-row" style="display:none">
-        Totalt per mån: <strong id="loan-total-text">—</strong>
-      </div>
-      <div class="input-grid" style="margin-top:14px">
-        <div class="input-item">
-          <label>Månadsavgift / hyra (kr)</label>
-          <input type="number" id="in-brf-avgift" value="0" step="100" oninput="update()">
-          <span class="input-hint">BRF-avgift, hyra eller 0</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-group">
-      <div class="settings-group-label">Övriga fasta kostnader per månad</div>
-      <div class="input-grid">
-        <div class="input-item">
-          <label>El &amp; uppvärmning</label>
-          <input type="number" id="in-el" value="0" step="100" oninput="update()">
-        </div>
-        <div class="input-item">
-          <label>Försäkring</label>
-          <input type="number" id="in-forsak" value="0" step="50" oninput="update()">
-        </div>
-        <div class="input-item">
-          <label>Telefoni</label>
-          <input type="number" id="in-tel" value="0" step="50" oninput="update()">
-        </div>
-        <div class="input-item">
-          <label>Streaming &amp; abonnemang</label>
-          <input type="number" id="in-stream" value="0" step="50" oninput="update()">
-        </div>
-        <div class="input-item">
-          <label>Förskola / barnomsorg</label>
-          <input type="number" id="in-forskola" value="0" step="100" oninput="update()">
-          <span class="input-hint">0 om ej aktuellt</span>
-        </div>
-        <div class="input-item">
-          <label>Mat, transport &amp; övrigt</label>
-          <input type="number" id="in-levnad" value="0" step="500" oninput="update()">
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-group">
-      <div class="settings-group-label">Tillgångar &amp; sparande</div>
-      <div class="input-grid">
-        <div class="input-item">
-          <label>Tillgängligt kapital (fonder/sparkonto)</label>
-          <input type="number" id="in-kapital" value="0" step="50000" oninput="update()">
-          <span class="input-hint">Används för kontantinsats &amp; buffert</span>
-        </div>
-        <div class="input-item">
-          <label>Månadssparande fonder (kr/mån)</label>
-          <input type="number" id="in-spar-fonder" value="0" step="1000" oninput="update()">
-          <span class="input-hint">Omfördelningsbart vid behov</span>
-        </div>
-        <div class="input-item">
-          <label>Semesterkonto (kr/mån)</label>
-          <input type="number" id="in-spar-semester" value="0" step="500" oninput="update()">
-        </div>
-      </div>
-    </div>
-
-    <div class="settings-group">
-      <div class="settings-group-label">Riskscenarier</div>
-      <div class="input-grid">
-        <div class="input-item">
-          <label>Ränteuppgång befintligt lån (procentenheter)</label>
-          <input type="number" id="in-rante-risk" value="2" step="0.5" oninput="update()">
-          <span class="input-hint">Simuleras i scenariotabellen</span>
-        </div>
-        <div class="input-item">
-          <label>Ev. amorteringskrav befintligt lån (% av lån/år)</label>
-          <input type="number" id="in-amor-risk" value="1" step="0.5" oninput="update()">
-          <span class="input-hint">Om amorteringskrav tillkommer framöver</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
   <!-- FLIKRAD -->
   <div class="tab-bar">
-    <button class="tab-btn" data-tab="brf" onclick="switchTab('brf')">
+    <button class="tab-btn active" data-tab="brf" onclick="switchTab('brf')">
       <span class="tab-icon">🏢</span> BRF
     </button>
     <button class="tab-btn" data-tab="hus" onclick="switchTab('hus')">
       <span class="tab-icon">🏡</span> Hus
     </button>
-    <button class="tab-btn active" data-tab="fritidshus" onclick="switchTab('fritidshus')">
+    <button class="tab-btn" data-tab="fritidshus" onclick="switchTab('fritidshus')">
       <span class="tab-icon">🌲</span> Fritidshus
     </button>
   </div>
 
   <!-- ══════════════════════════════════════════════════════ BRF-PANEL -->
-  <div id="tab-brf" class="tab-panel">
+  <div id="tab-brf" class="tab-panel active">
     <div class="divider"></div>
     <div class="section-label">Välj BRF-parametrar</div>
     <div class="slider-section">
@@ -1241,7 +2080,7 @@
   </div>
 
   <!-- ══════════════════════════════════════════════════ FRITIDSHUS-PANEL -->
-  <div id="tab-fritidshus" class="tab-panel active">
+  <div id="tab-fritidshus" class="tab-panel">
   <!-- SLIDER -->
   <div class="divider"></div>
   <div class="section-label">Välj fritidshuspris</div>
@@ -1817,7 +2656,7 @@
   }
 
   // ─── FLIKSTYRNING ─────────────────────────────────────────────────────────
-  let activeTab = 'fritidshus';
+  let activeTab = 'brf';
 
   function switchTab(name) {
     activeTab = name;
@@ -2314,6 +3153,312 @@
   renderLoans();
   buildKommunDropdown();
   recalcNetto();
+
+  // ─── DATA DRAWER ──────────────────────────────────────────────────────────
+
+  function openDataDrawer() {
+    document.getElementById('data-drawer').classList.add('open');
+    document.getElementById('data-drawer-backdrop').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDataDrawer() {
+    document.getElementById('data-drawer').classList.remove('open');
+    document.getElementById('data-drawer-backdrop').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ─── WIZARD ───────────────────────────────────────────────────────────────
+
+  let _wizStep = 1;
+  const WIZ_STEPS = 5;
+  let _wizType = 'brf';
+
+  // Sync a value to a main form input by ID
+  function syncMainEl(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.value = val;
+  }
+
+  // Sync a value to a range slider, clamped to its min/max
+  function syncSliderEl(id, val) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const v = parseFloat(val) || 0;
+    el.value = Math.max(+el.min || 0, Math.min(+el.max || 999999999, v));
+  }
+
+  // Map of slider IDs per type and field
+  const WIZ_SLIDER_MAP = {
+    pris:  { brf: 'brf-sl-pris',  hus: 'hus-sl-pris',  fritidshus: 'sl-pris'  },
+    ki:    { brf: 'brf-sl-ki',    hus: 'hus-sl-ki',    fritidshus: 'sl-ki'    },
+    ranta: { brf: 'brf-sl-ranta', hus: 'hus-sl-ranta', fritidshus: 'sl-ranta' },
+    amor:  { brf: 'brf-sl-amor',  hus: 'hus-sl-amor',  fritidshus: 'sl-amor'  },
+  };
+
+  function wizSyncObjSlider(field, val) {
+    const sliderId = WIZ_SLIDER_MAP[field]?.[_wizType];
+    if (sliderId) { syncSliderEl(sliderId, val); update(); }
+  }
+
+  // Add / remove person 2 in step 1
+  function wizAddP2() {
+    document.getElementById('wiz-p2-card').style.display = 'block';
+    document.getElementById('wiz-add-p2-btn').style.display = 'none';
+    document.getElementById('wiz-p2-namn').focus();
+  }
+  function wizRemoveP2() {
+    document.getElementById('wiz-p2-card').style.display = 'none';
+    document.getElementById('wiz-add-p2-btn').style.display = '';
+    syncMainEl('in-p2-brutto', '0');
+    syncMainEl('in-p2-namn', '');
+    recalcNetto();
+  }
+
+  // Select objective type (BRF/Hus/Fritidshus) in step 5
+  function wizSelectType(type) {
+    _wizType = type;
+    ['brf','hus','fritidshus'].forEach(t => {
+      document.getElementById('wiz-type-' + t).classList.toggle('wiz-selected', t === type);
+    });
+    document.getElementById('wiz-obj-brf').style.display     = type === 'brf'        ? 'block' : 'none';
+    document.getElementById('wiz-obj-hus').style.display     = type === 'hus'        ? 'block' : 'none';
+    document.getElementById('wiz-obj-fritids').style.display = type === 'fritidshus' ? 'block' : 'none';
+    switchTab(type);
+  }
+
+  // Pre-fill step 5 sliders from current main form slider values
+  function _wizInitStep5() {
+    wizSelectType(_wizType);
+    const g = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+    document.getElementById('wiz-pris').value  = g(WIZ_SLIDER_MAP.pris[_wizType]);
+    document.getElementById('wiz-ki').value    = g(WIZ_SLIDER_MAP.ki[_wizType]);
+    document.getElementById('wiz-ranta').value = g(WIZ_SLIDER_MAP.ranta[_wizType]);
+    document.getElementById('wiz-amor').value  = g(WIZ_SLIDER_MAP.amor[_wizType]);
+    document.getElementById('wiz-avgift').value = g('brf-sl-avgift');
+    document.getElementById('wiz-drift').value  = g('hus-sl-drift');
+    document.getElementById('wiz-hyra').value   = g('sl-hyra');
+    document.getElementById('wiz-veckor').value = g('sl-veckor');
+  }
+
+  // Render wizard loan list in step 4
+  function wizRenderLoans() {
+    const container = document.getElementById('wiz-loans-list');
+    if (!container) return;
+    if (existingLoans.length === 0) {
+      container.innerHTML = '<p style="font-size:13px;color:var(--grey);margin-bottom:10px">Inga lån inlagda.</p>';
+      return;
+    }
+    container.innerHTML = existingLoans.map((l, i) => `
+      <div class="wiz-loan-item">
+        <button class="wiz-loan-remove" onclick="wizRemoveLoan(${i})" title="Ta bort">✕</button>
+        <div class="wiz-loan-name">${l.desc || 'Lån ' + (i+1)}</div>
+        <div class="wiz-3col">
+          <div class="wiz-field">
+            <label>Belopp (kr)</label>
+            <input type="number" value="${l.belopp || ''}" step="50000" placeholder="0"
+              oninput="existingLoans[${i}].belopp=+this.value; renderLoans(); update()">
+          </div>
+          <div class="wiz-field">
+            <label>Ränta (%)</label>
+            <input type="number" value="${l.ranta}" step="0.1" placeholder="3.5"
+              oninput="existingLoans[${i}].ranta=+this.value; renderLoans(); update()">
+          </div>
+          <div class="wiz-field">
+            <label>Amor./mån (kr)</label>
+            <input type="number" value="${l.amor || ''}" step="500" placeholder="0"
+              oninput="existingLoans[${i}].amor=+this.value; renderLoans(); update()">
+          </div>
+        </div>
+        <div class="wiz-field">
+          <label>Benämning</label>
+          <input type="text" value="${l.desc}" placeholder="Bolån"
+            oninput="existingLoans[${i}].desc=this.value; wizRenderLoans()">
+        </div>
+      </div>`).join('');
+  }
+
+  function wizAddLoan() {
+    existingLoans.push({ desc: 'Nytt lån', belopp: 0, ranta: 3.0, amor: 0 });
+    wizRenderLoans();
+    renderLoans();
+  }
+
+  function wizRemoveLoan(idx) {
+    if (existingLoans.length <= 1) {
+      existingLoans[0] = { desc: 'Bolån', belopp: 0, ranta: 3.0, amor: 0 };
+    } else {
+      existingLoans.splice(idx, 1);
+    }
+    wizRenderLoans();
+    renderLoans();
+    update();
+  }
+
+  // Pre-fill all wizard inputs from current main form values
+  function _wizLoadFromMain() {
+    const pairs = [
+      ['wiz-p1-namn','in-p1-namn'], ['wiz-p2-namn','in-p2-namn'],
+      ['wiz-p1-brutto','in-p1-brutto'], ['wiz-p2-brutto','in-p2-brutto'],
+      ['wiz-el','in-el'], ['wiz-forsak','in-forsak'],
+      ['wiz-tel','in-tel'], ['wiz-stream','in-stream'],
+      ['wiz-forskola','in-forskola'], ['wiz-levnad','in-levnad'],
+      ['wiz-spar-fonder','in-spar-fonder'], ['wiz-spar-semester','in-spar-semester'],
+      ['wiz-kapital','in-kapital'], ['wiz-brf-avgift','in-brf-avgift'],
+    ];
+    pairs.forEach(([wId, mId]) => {
+      const wEl = document.getElementById(wId);
+      const mEl = document.getElementById(mId);
+      if (wEl && mEl) wEl.value = mEl.value || '';
+    });
+    _wizType = activeTab || 'brf';
+    // Show person 2 card if they already have data
+    const p2Brutto = +document.getElementById('in-p2-brutto')?.value || 0;
+    if (p2Brutto > 0) {
+      document.getElementById('wiz-p2-card').style.display = 'block';
+      document.getElementById('wiz-add-p2-btn').style.display = 'none';
+    } else {
+      document.getElementById('wiz-p2-card').style.display = 'none';
+      document.getElementById('wiz-add-p2-btn').style.display = '';
+    }
+  }
+
+  // Render wizard step: update active step, progress bar, buttons
+  function _wizRender() {
+    for (let i = 1; i <= WIZ_STEPS; i++) {
+      const el = document.getElementById('wiz-step-' + i);
+      if (el) el.classList.toggle('wiz-active', i === _wizStep);
+    }
+    document.getElementById('wiz-progress-fill').style.width = (_wizStep / WIZ_STEPS * 100) + '%';
+    document.getElementById('wiz-step-label').textContent = `Steg ${_wizStep} av ${WIZ_STEPS}`;
+    document.getElementById('wiz-back-btn').disabled = _wizStep === 1;
+    const nextBtn = document.getElementById('wiz-next-btn');
+    nextBtn.textContent = _wizStep === WIZ_STEPS ? 'Se bedömning →' : 'Nästa →';
+    // Scroll panel to top on step change
+    const panel = document.getElementById('wizard-panel');
+    if (panel) panel.scrollTop = 0;
+    // Render step-specific dynamic content
+    if (_wizStep === 4) wizRenderLoans();
+    if (_wizStep === 5) _wizInitStep5();
+  }
+
+  function wizardOpen() {
+    _wizStep = 1;
+    _wizLoadFromMain();
+    _wizRender();
+    // Reset to wizard panel view
+    document.getElementById('wizard-panel').style.display = '';
+    document.getElementById('wiz-analyzing').classList.remove('wiz-visible');
+    document.getElementById('wiz-summary').classList.remove('wiz-visible');
+    document.getElementById('wizard-overlay').classList.remove('wiz-hidden');
+    document.getElementById('result-box').style.display = 'none';
+    document.querySelector('.result-box-placeholder').style.display = 'none';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function wizardExit() {
+    const cameFromSummary = document.getElementById('wiz-summary').classList.contains('wiz-visible');
+    document.getElementById('wizard-overlay').classList.add('wiz-hidden');
+    document.getElementById('wiz-summary').classList.remove('wiz-visible');
+    document.getElementById('wiz-analyzing').classList.remove('wiz-visible');
+    document.getElementById('wizard-panel').style.display = '';
+    document.body.style.overflow = '';
+    document.getElementById('result-box').style.display = '';
+    document.querySelector('.result-box-placeholder').style.display = '';
+    update();
+    // Scrolla till Rekommendation om användaren kom från sammanfattningen
+    if (cameFromSummary) {
+      const rekId = { brf: 'brf-rek-rubrik', hus: 'hus-rek-rubrik', fritidshus: 'rek-rubrik' };
+      const target = document.getElementById(rekId[activeTab] || 'rek-rubrik');
+      if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+    }
+  }
+
+  function wizardNext() {
+    if (_wizStep < WIZ_STEPS) {
+      _wizStep++;
+      _wizRender();
+    } else {
+      wizardFinish();
+    }
+  }
+
+  function wizardPrev() {
+    if (_wizStep > 1) {
+      _wizStep--;
+      _wizRender();
+    }
+  }
+
+  // Called when user completes the last wizard step
+  function wizardFinish() {
+    update(); // run calculation in background
+
+    // Swap to analyzing screen
+    document.getElementById('wizard-panel').style.display = 'none';
+    const analyzing = document.getElementById('wiz-analyzing');
+    analyzing.classList.add('wiz-visible');
+
+    // Cycle through analysis phrases
+    const phrases = [
+      'Analyserar inkomster',
+      'Beräknar lånekostnader',
+      'Utvärderar kassaflöde',
+    ];
+    const labelEl = document.getElementById('wiz-analyze-label');
+    labelEl.textContent = phrases[0];
+    let pi = 0;
+    const ticker = setInterval(() => {
+      pi++;
+      if (pi < phrases.length) {
+        labelEl.style.opacity = '0';
+        setTimeout(() => {
+          labelEl.textContent = phrases[pi];
+          labelEl.style.opacity = '1';
+        }, 180);
+      } else {
+        clearInterval(ticker);
+      }
+    }, 600);
+
+    // After 2s show summary
+    setTimeout(() => {
+      clearInterval(ticker);
+      analyzing.classList.remove('wiz-visible');
+      wizShowSummary();
+      document.getElementById('wiz-summary').classList.add('wiz-visible');
+    }, 2000);
+  }
+
+  // Populate and show the summary modal from the live result-box values
+  function wizShowSummary() {
+    update(); // ensure fresh values
+    const rb      = document.getElementById('result-box');
+    const cls     = rb.classList.contains('feasible') ? 'feasible'
+                  : rb.classList.contains('caution')  ? 'caution' : 'risky';
+
+    document.getElementById('wiz-sum-header').className  = `wiz-sum-header ${cls}`;
+    document.getElementById('wiz-sum-badge').textContent  = document.getElementById('res-tab-badge').textContent;
+    document.getElementById('wiz-sum-verdict').textContent = document.getElementById('res-verdict').textContent;
+    document.getElementById('wiz-sum-sub').textContent     = document.getElementById('res-sub').textContent;
+    document.getElementById('wiz-sum-lank').textContent    = document.getElementById('rm-lank').textContent + ' kr/mån';
+    document.getElementById('wiz-sum-skuld').textContent   = document.getElementById('rm-skuld').textContent + ' kr';
+    document.getElementById('wiz-sum-ratio').textContent   = document.getElementById('rm-ratio').textContent;
+
+    const kvarEl = document.getElementById('wiz-sum-kvar');
+    kvarEl.textContent = document.getElementById('rm-kvar').textContent + ' kr/mån';
+    kvarEl.className = 'wiz-sum-metric-val ' + (cls === 'feasible' ? 'green' : cls === 'caution' ? 'amber' : 'red');
+
+    document.getElementById('wiz-sum-warns').innerHTML = document.getElementById('warnings').innerHTML;
+  }
+
+  // Auto-open wizard on fresh page load (no income entered)
+  (function() {
+    const p1 = document.getElementById('in-p1-brutto');
+    if (!p1 || !p1.value || +p1.value === 0) {
+      wizardOpen();
+    }
+  })();
 </script>
 
 </body>
